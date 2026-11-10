@@ -22,3 +22,12 @@ Column names it recognises: `P`, `Vrel`, `LDO`, `Z`, `Z2ph`, `Np`, `Bo`, `Rs`, `
 Outliers are found with a robust polynomial fit (iteratively re-weighted, Tukey bisquare) and a robust z-score; the threshold is adjustable. A flag is a reason to look at a point, not a verdict.
 
 Data and exclusions are saved in the browser you use; they are not uploaded anywhere.
+
+## Running on Streamlit
+
+The repo root has `streamlit_app.py`, which embeds this page.
+
+- Locally: `pip install -r requirements.txt` then `streamlit run streamlit_app.py`.
+- Streamlit Community Cloud: create an app from this repo, branch `main`, main file `streamlit_app.py`.
+
+Inside Streamlit the page sits in a scrollable frame (raise `height` in `streamlit_app.py` if needed). If "Copy CSV" is blocked, the CSV text is selected; press Ctrl/Cmd+C.
