@@ -1,0 +1,1910 @@
+{
+ "format": "fluxwell-project",
+ "version": 1,
+ "name": "Abura 12S_5AB6",
+ "saved": "2026-11-05T03:21:48+00:00",
+ "inputs": {
+  "woe_tb_dfc": 1.0,
+  "comp_ang": 45.0,
+  "woe_tb_packer": 8953.26,
+  "gl_valve_man": "All",
+  "acid_m_illite": 0.0,
+  "gl_tg": 80.0,
+  "pvt_rsb": 345.0,
+  "woe_cn_mode": "Water coning (bottom water)",
+  "gl_pwh_unl": 250.0,
+  "acid_phi": 0.2,
+  "unit_pressure": "psia",
+  "woe_tb_derate": 1.0,
+  "acid_damage": "No damaged zone exists (the mud acid removes minerals in the matrix)",
+  "woe_cn_hw": 100.0,
+  "pvt_sel_visc": "petrosky",
+  "gl_p1_hagedorn_brown": 1.0,
+  "frac_cw": 0.0031,
+  "woe_cn_h": 50.0,
+  "gl_qgi": 1.0,
+  "gl_spacing": "Normal",
+  "unit_temperature": "\u00b0F",
+  "woe_cn_mu_g": 0.024142,
+  "pvt_sal": 3000.0,
+  "frac_pi0": 1.4,
+  "acid_form": "Calculate optimum formulation based on ionic equilibrium",
+  "gl_vkind": "Casing sensitive",
+  "frac_wall": 75.0,
+  "frac_rho": 8.83,
+  "pvt_hyd_on": false,
+  "frac_obg": 1.05167,
+  "acid_m_calcite": 18.0,
+  "acid_vol": 10000.0,
+  "comp_alk": 0.0,
+  "woe_sd_tvd": 9135.5,
+  "woe_sd_pi": 3851.0,
+  "sys_node": "Bottom node",
+  "acid_m_albite": 0.0,
+  "comp_irc": 0.0,
+  "acid_obg": 1.05167,
+  "acid_m_muscovite": 2.0,
+  "pvt_pb": 2552.0,
+  "gl_mintr": 25.0,
+  "unit_gas_rate": "MMscf/d",
+  "acid_k": 50.0,
+  "pvt_api": 30.03,
+  "woe_cn_z": 0.882827,
+  "woe_sd_k": 2.5,
+  "sys_flags": "Yes",
+  "frac_ten": 500.0,
+  "woe_cn_follow": true,
+  "comp_w": 0.0,
+  "acid_m_mixed_feldspars": 1.0,
+  "gl_p2_hagedorn_brown": 1.0,
+  "woe_tb_on": true,
+  "unit_heat_capacity": "BTU/lb/F",
+  "woe_cn_kro": 0.8,
+  "acid_m_microcline": 0.0,
+  "gl_injpt": "Orifice",
+  "woe_p1_hagedorn_brown": 1.0,
+  "woe_cn_mu_o": 1.448246,
+  "gl_corr": "hagedorn_brown",
+  "comp_s": 0.05,
+  "eq_cpo": 0.53,
+  "woe_tb_dft": 1.25,
+  "gl_wc": 40.0,
+  "gl_ipr_unl": true,
+  "gl_n2": 0.0,
+  "acid_m_montmorillonite": 0.0,
+  "eq_cpw": 1.0,
+  "eq_usur": 8.0,
+  "frac_nu": 0.2,
+  "woe_sand_on": true,
+  "sys_corr": "pe5_style",
+  "woe_sd_well": "vertical",
+  "gl_slast": 0.0,
+  "acid_m_kaolinite": 0.0,
+  "gl_rate_mode": "Calculated from max production",
+  "ipr_t_from_pvt": true,
+  "acid_nu": 0.2,
+  "comp_gf": 2.0,
+  "acid_spf": 8.0,
+  "woe_tb_extra": 0.0,
+  "comp_rho_s": 2.65,
+  "acid_bh": 8.496,
+  "woe_cn_phi": 0.2,
+  "woe_cn_qf": 13.0,
+  "woe_tb_size": "2-7/8\" 6.50 lb/ft",
+  "acid_rb": 166.0,
+  "gl_spread": true,
+  "comp_dp": 250.0,
+  "ipr_model_oil": "P.I. Entry",
+  "gl_ann_t": true,
+  "frac_pint": 100.0,
+  "pvt_gg": 0.595,
+  "gl_qmax": 3859.0,
+  "comp_eff": 0.0,
+  "gl_sg": 0.7,
+  "woe_tb_ppg": 8.6,
+  "acid_pi0": 5.0,
+  "woe_cn_kvkh": 0.1,
+  "gl_tco": 0.0,
+  "unit_diameter": "in",
+  "pvt_n2": 0.1,
+  "woe_cs_ext": 10.0,
+  "gl_pwh": 250.0,
+  "acid_m_dolomite": 0.0,
+  "woe_tb_dfb": 1.1,
+  "pvt_sel_pb": "glaso",
+  "unit_productivity_index": "STB/d/psi",
+  "gl_well": "New well",
+  "woe_cs_bkp": 8.6,
+  "unit_liquid_rate": "STB/d",
+  "gl_co2": 0.0,
+  "woe_sd_sh": 0.75,
+  "comp_c": 400.0,
+  "woe_cn_rho_o": 0.776107,
+  "frac_k": 50.0,
+  "sys_lhi": "DisAllow",
+  "frac_cmax": 1.0,
+  "woe_sd_gamma": 0.6,
+  "woe_cs_derate": 1.0,
+  "ipr_pr": 3812.4,
+  "sys_gor": 345.0,
+  "acid_pint": 100.0,
+  "pvt_t": 153.0,
+  "gl_m2": 50.0,
+  "ipr_wc": 40.0,
+  "acid_ten": 500.0,
+  "pvt_use_match": true,
+  "woe_hydrate": false,
+  "pvt_co2": 0.28,
+  "woe_tb_dfa": 1.3,
+  "frac_pd": 0.62,
+  "woe_turner": false,
+  "sys_p2_hagedorn_brown": 1.0,
+  "gl_orif": "Calculated dP at orifice",
+  "unit_volume": "ft3",
+  "acid_area": 500.0,
+  "gl_h2s": 0.0,
+  "frac_qmin": 200.0,
+  "ipr_sens_var": "wc",
+  "gl_maxmd": 8949.0,
+  "woe_erosion": true,
+  "unit_gor": "scf/STB",
+  "gl_gor": 345.0,
+  "frac_tsur": 60.0,
+  "acid_m_mixed_clays": 12.0,
+  "woe_cn_on": false,
+  "frac_sloss": 200.0,
+  "gl_dpv": 100.0,
+  "gl_dpc": 20.0,
+  "woe_cn_rw": 0.354,
+  "unit_compressibility": "1/psi",
+  "gl_use_fit": true,
+  "gl_pinj": 1200.0,
+  "gl_qgi_unl": 1.0,
+  "unit_permeability": "md",
+  "woe_sd_nu": 0.25,
+  "woe_whp_min": 150.0,
+  "acid_wct": 0.0,
+  "woe_cn_k": 50.0,
+  "woe_sd_biot": 1.0,
+  "acid_pd": 0.62,
+  "gl_pko": 1200.0,
+  "frac_bh": 8.496,
+  "unit_pressure_diff": "psi",
+  "woe_cn_rho_w": 0.993668,
+  "calc_mode": "System analysis (IPR + VLP)",
+  "sys_rate_method": "Automatic - Geometric",
+  "gl_dome_hp": true,
+  "woe_corr": "pe5_style",
+  "unit_density": "lb/ft3",
+  "gl_m1": 50.0,
+  "woe_sd_twc": 2000.0,
+  "unit_viscosity": "cp",
+  "woe_whp_op": 250.0,
+  "frac_phi": 0.2,
+  "gl_unl_m": "Transfer pressure",
+  "woe_tb_pann": 1500.0,
+  "woe_sd_src": "From UCS",
+  "unit_length": "ft",
+  "eq_simple_grid": false,
+  "woe_cn_rho_g": 0.213392,
+  "gl_valve": "Generic 1-in IPO (Ab = 0.31 in2)",
+  "woe_sd_margin": 20.0,
+  "woe_pe5": false,
+  "frac_E": 3000000.0,
+  "woe_sd_ratio": 1.0,
+  "acid_qt": 10627.8,
+  "frac_vmax": 4000.0,
+  "unit_pressure_gradient": "psi/ft",
+  "unit_cgr": "STB/MMscf",
+  "gl_gs": 0.465,
+  "pvt_h2s": 0.0,
+  "frac_area": 500.0,
+  "ipr_j": 1.419879727449389,
+  "woe_sd_ucs": 1000.0,
+  "frac_spf": 8.0,
+  "woe_whp_max_on": false,
+  "unit_area": "acres",
+  "pvt_impurity_corr": false,
+  "woe_cn_mu_w": 0.467509,
+  "unit_heat_transfer": "BTU/h/ft2/F",
+  "sys_use_fit": true,
+  "eq_tsur": 60.0,
+  "woe_tb_method": "ISO",
+  "comp_turner": 2.04,
+  "frac_inc": 50.0,
+  "acid_m_quartz": 67.0,
+  "sys_wc": 40.0,
+  "comp_wall": "Carbon steel",
+  "woe_p2_hagedorn_brown": 1.0,
+  "woe_cn_hp": 16.7,
+  "woe_cs_size": "9-5/8\" 47.00 lb/ft",
+  "sys_p1_hagedorn_brown": 1.0,
+  "gl_minsp": 250.0,
+  "woe_stab": true,
+  "woe_sd_sv": 1.0,
+  "frac_qmax": 400.0,
+  "eq_u": 2.04713,
+  "woe_cs_grade": "P-110",
+  "woe_tb_grade": "N-80",
+  "frac_h": 100.0,
+  "ipr_vogel": true,
+  "eq_cpg": 0.51,
+  "comp_def": "Ductile",
+  "gl_chk_ipr": true,
+  "gl_tcv": 0.0,
+  "woe_cn_krw": 0.3,
+  "woe_cn_bo": 1.186329,
+  "unit_velocity": "ft/s",
+  "woe_cn_re": 1490.0,
+  "unit_gas_volume": "Mscf",
+  "woe_cn_krg": 0.6,
+  "woe_cs_on": true,
+  "frac_vmin": 1000.0,
+  "sys_whp": 254.18
+ },
+ "widgets": {
+  "opt_method": "black_oil",
+  "opt_water_vapour": "none",
+  "eq_filter_on": true,
+  "vlp_cmp_corrs": [
+   "tuffp_unified",
+   "pe5_style",
+   "pe5_extended_style",
+   "pe2_style",
+   "duns_ros",
+   "duns_ros_gould",
+   "ansari",
+   "hagedorn_brown",
+   "beggs_brill",
+   "beggs_brill_noslip",
+   "gray",
+   "mukherjee_brill",
+   "orkiszewski",
+   "aziz",
+   "fancher_brown",
+   "no_slip"
+  ],
+  "opt_fluid_type": "oil",
+  "_vl_woe_sw_gor": [
+   345.0
+  ],
+  "opt_temp_model": "rough",
+  "opt_completion": "cased_hole",
+  "opt_steam": "none",
+  "opt_well_type": "producer",
+  "opt_separator": "single_stage",
+  "opt_emulsions": "none",
+  "opt_viscosity_model": "newtonian",
+  "opt_artificial_lift": "none",
+  "vlp_match_corrs": [
+   "pe5_style",
+   "pe2_style",
+   "hagedorn_brown",
+   "beggs_brill"
+  ],
+  "sys_sens_on": false,
+  "_vl_woe_sw_pr": [
+   3812.4
+  ],
+  "opt_sand_control": "none",
+  "opt_flow_type": "tubing"
+ },
+ "tables": {
+  "pvt_table": {
+   "__df__": {
+    "columns": [
+     "Pressure",
+     "Gas Oil Ratio",
+     "Oil FVF",
+     "Oil Viscosity"
+    ],
+    "index": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15
+    ],
+    "data": [
+     [
+      5515.0,
+      null,
+      1.167,
+      1.61
+     ],
+     [
+      5015.0,
+      null,
+      1.171,
+      1.58
+     ],
+     [
+      4515.0,
+      null,
+      1.175,
+      1.48
+     ],
+     [
+      3851.0,
+      null,
+      1.181,
+      1.4
+     ],
+     [
+      3515.0,
+      null,
+      1.184,
+      1.36
+     ],
+     [
+      3015.0,
+      null,
+      1.189,
+      1.28
+     ],
+     [
+      2615.0,
+      null,
+      1.193,
+      1.24
+     ],
+     [
+      2552.0,
+      345.0,
+      1.193,
+      1.23
+     ],
+     [
+      2215.0,
+      306.1,
+      1.183,
+      1.39
+     ],
+     [
+      1815.0,
+      255.2,
+      1.17,
+      1.57
+     ],
+     [
+      1415.0,
+      196.2,
+      1.1551,
+      1.75
+     ],
+     [
+      1015.0,
+      138.3,
+      1.1391,
+      1.93
+     ],
+     [
+      515.0,
+      67.5,
+      1.1201,
+      2.17
+     ],
+     [
+      15.0,
+      0.0,
+      1.0393,
+      2.4
+     ],
+     [
+      null,
+      null,
+      null,
+      null
+     ]
+    ]
+   },
+   "dtypes": {
+    "Pressure": "float64",
+    "Gas Oil Ratio": "float64",
+    "Oil FVF": "float64",
+    "Oil Viscosity": "float64"
+   },
+   "index_name": "Point"
+  },
+  "pvt_hydrate": {
+   "__df__": {
+    "columns": [
+     "Pressure (psig)",
+     "Temperature (\u00b0F)"
+    ],
+    "index": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24,
+     25
+    ],
+    "data": [
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ]
+    ]
+   },
+   "dtypes": {
+    "Pressure (psig)": "float64",
+    "Temperature (\u00b0F)": "float64"
+   },
+   "index_name": "Point"
+  },
+  "eq_survey": {
+   "__df__": {
+    "columns": [
+     "Measured Depth (ft)",
+     "True Vertical Depth (ft)"
+    ],
+    "index": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "data": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      5458.0,
+      5457.91
+     ],
+     [
+      5742.0,
+      5741.9
+     ],
+     [
+      6029.0,
+      6028.9
+     ],
+     [
+      6600.0,
+      6599.84
+     ],
+     [
+      6886.0,
+      6885.79
+     ],
+     [
+      7176.0,
+      7175.66
+     ],
+     [
+      7653.0,
+      7652.41
+     ],
+     [
+      7939.0,
+      7938.23
+     ],
+     [
+      8127.0,
+      8126.12
+     ],
+     [
+      8322.0,
+      8321.02
+     ],
+     [
+      8513.0,
+      8511.93
+     ],
+     [
+      8703.0,
+      8701.85
+     ],
+     [
+      8894.0,
+      8892.78
+     ],
+     [
+      8990.0,
+      8988.76
+     ],
+     [
+      9197.0,
+      9195.73
+     ],
+     [
+      9847.0,
+      9845.62
+     ],
+     [
+      10039.0,
+      10037.6
+     ],
+     [
+      10231.0,
+      10229.5
+     ],
+     [
+      10520.0,
+      10518.5
+     ]
+    ]
+   },
+   "dtypes": {
+    "Measured Depth (ft)": "float64",
+    "True Vertical Depth (ft)": "float64"
+   },
+   "index_name": "Point"
+  },
+  "eq_long": {
+   "__df__": {
+    "columns": [
+     "Measured Depth (ft)",
+     "True Vertical Depth (ft)"
+    ],
+    "index": [
+     0,
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20,
+     21,
+     22,
+     23,
+     24,
+     25,
+     26,
+     27,
+     28,
+     29,
+     30,
+     31
+    ],
+    "data": [
+     [
+      0.0,
+      0.0
+     ],
+     [
+      5345.0,
+      5344.91
+     ],
+     [
+      5458.0,
+      5457.91
+     ],
+     [
+      5742.0,
+      5741.9
+     ],
+     [
+      6029.0,
+      6028.9
+     ],
+     [
+      6313.0,
+      6312.87
+     ],
+     [
+      6504.0,
+      6503.85
+     ],
+     [
+      6600.0,
+      6599.84
+     ],
+     [
+      6886.0,
+      6885.79
+     ],
+     [
+      7176.0,
+      7175.66
+     ],
+     [
+      7366.0,
+      7365.56
+     ],
+     [
+      7462.0,
+      7461.51
+     ],
+     [
+      7653.0,
+      7652.41
+     ],
+     [
+      7750.0,
+      7749.35
+     ],
+     [
+      7939.0,
+      7938.23
+     ],
+     [
+      8127.0,
+      8126.12
+     ],
+     [
+      8322.0,
+      8321.02
+     ],
+     [
+      8513.0,
+      8511.93
+     ],
+     [
+      8703.0,
+      8701.85
+     ],
+     [
+      8894.0,
+      8892.78
+     ],
+     [
+      8990.0,
+      8988.76
+     ],
+     [
+      9197.0,
+      9195.73
+     ],
+     [
+      9369.0,
+      9367.7
+     ],
+     [
+      9564.0,
+      9562.67
+     ],
+     [
+      9659.0,
+      9657.65
+     ],
+     [
+      9847.0,
+      9845.62
+     ],
+     [
+      10039.0,
+      10037.6
+     ],
+     [
+      10231.0,
+      10229.5
+     ],
+     [
+      10326.0,
+      10324.5
+     ],
+     [
+      10421.0,
+      10419.5
+     ],
+     [
+      10437.0,
+      10435.5
+     ],
+     [
+      10520.0,
+      10518.5
+     ]
+    ]
+   },
+   "dtypes": {
+    "Measured Depth (ft)": "float64",
+    "True Vertical Depth (ft)": "float64"
+   },
+   "index_name": null
+  },
+  "eq_surface": {
+   "__df__": {
+    "columns": [
+     "Label",
+     "Type",
+     "Fitting",
+     "Pipe Length (ft)",
+     "TVD of End Point (ft)",
+     "Pipe Inside Diameter (in)",
+     "Pipe Inside Roughness (in)",
+     "Rate Multiplier",
+     "::auto_unique_id::"
+    ],
+    "index": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10
+    ],
+    "data": [
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ]
+   },
+   "dtypes": {
+    "Label": "object",
+    "Type": "object",
+    "Fitting": "object",
+    "Pipe Length (ft)": "float64",
+    "TVD of End Point (ft)": "float64",
+    "Pipe Inside Diameter (in)": "float64",
+    "Pipe Inside Roughness (in)": "float64",
+    "Rate Multiplier": "float64",
+    "::auto_unique_id::": "object"
+   },
+   "index_name": "Point"
+  },
+  "eq_downhole": {
+   "__df__": {
+    "columns": [
+     "Label",
+     "Type",
+     "Measured Depth (ft)",
+     "Tubing Inside Diameter (in)",
+     "Tubing Inside Roughness (in)",
+     "Tubing Outside Diameter (in)",
+     "Tubing Outside Roughness (in)",
+     "Casing Inside Diameter (in)",
+     "Casing Inside Roughness (in)",
+     "Rate Multiplier",
+     "::auto_unique_id::"
+    ],
+    "index": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18
+    ],
+    "data": [
+     [
+      null,
+      "Xmas Tree",
+      33.0,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      "Tubing",
+      111.87,
+      2.441,
+      0.0006,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      null,
+      "SSSV",
+      null,
+      1.5,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      "Tubing",
+      6125.32,
+      2.441,
+      0.0006,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      "GLM #1",
+      "Gas Lift Mandrel",
+      null,
+      2.367,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      null,
+      "Tubing",
+      6628.88,
+      2.441,
+      0.0006,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      "GLM #2",
+      "Gas Lift Mandrel",
+      null,
+      2.367,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      null,
+      "Tubing",
+      7116.54,
+      2.441,
+      0.0006,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      "GLM #3",
+      "Gas Lift Mandrel",
+      null,
+      2.367,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      null,
+      "Tubing",
+      8888.5,
+      2.441,
+      0.0006,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      null,
+      "SSD",
+      null,
+      2.313,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      null,
+      "Tubing",
+      8967.2,
+      2.441,
+      0.0006,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      "X NIPPLE",
+      "Restriction",
+      null,
+      2.313,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      null,
+      "Tubing",
+      8973.91,
+      2.441,
+      0.0006,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      "XN LANDING NIPPLE",
+      "Restriction",
+      null,
+      2.205,
+      null,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      "EOT",
+      "Tubing",
+      8978.91,
+      2.441,
+      0.0006,
+      null,
+      null,
+      null,
+      null,
+      1.0,
+      null
+     ],
+     [
+      null,
+      "Casing",
+      9125.0,
+      null,
+      null,
+      null,
+      null,
+      8.681,
+      0.0006,
+      1.0,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ]
+   },
+   "dtypes": {
+    "Label": "str",
+    "Type": "str",
+    "Measured Depth (ft)": "float64",
+    "Tubing Inside Diameter (in)": "float64",
+    "Tubing Inside Roughness (in)": "float64",
+    "Tubing Outside Diameter (in)": "float64",
+    "Tubing Outside Roughness (in)": "float64",
+    "Casing Inside Diameter (in)": "float64",
+    "Casing Inside Roughness (in)": "float64",
+    "Rate Multiplier": "float64",
+    "::auto_unique_id::": "object"
+   },
+   "index_name": "Point"
+  },
+  "eq_geo": {
+   "__df__": {
+    "columns": [
+     "Formation Measured Depth (ft)",
+     "Formation Temperature (deg F)"
+    ],
+    "index": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "data": [
+     [
+      33.0,
+      60.0
+     ],
+     [
+      9125.5,
+      153.0
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ],
+     [
+      null,
+      null
+     ]
+    ]
+   },
+   "dtypes": {
+    "Formation Measured Depth (ft)": "float64",
+    "Formation Temperature (deg F)": "float64"
+   },
+   "index_name": "Point"
+  },
+  "vlp_tests_oil": {
+   "__df__": {
+    "columns": [
+     "Test Point Date",
+     "Test Point Comment",
+     "Tubing Head Pressure (psia)",
+     "Tubing Head Temperature (deg F)",
+     "Water Cut (percent)",
+     "Liquid Rate (STB/day)",
+     "Gauge Depth (Measured) (feet)",
+     "Gauge Pressure (psia)",
+     "Reservoir Pressure (psia)",
+     "Gas Oil Ratio (scf/STB)",
+     "GOR Free (scf/STB)",
+     "Manifold Pressure (psia)",
+     "Choke Size (64ths in)"
+    ],
+    "index": [
+     1,
+     2,
+     3,
+     4,
+     5,
+     6,
+     7,
+     8,
+     9,
+     10,
+     11,
+     12,
+     13,
+     14,
+     15,
+     16,
+     17,
+     18,
+     19,
+     20
+    ],
+    "data": [
+     [
+      "11/04/2026",
+      null,
+      254.18,
+      89.68,
+      40.0,
+      395.23,
+      8965.0,
+      3472.83,
+      3812.4,
+      345.0,
+      0.0,
+      null,
+      20.0
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ],
+     [
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null
+     ]
+    ]
+   },
+   "dtypes": {
+    "Test Point Date": "object",
+    "Test Point Comment": "object",
+    "Tubing Head Pressure (psia)": "float64",
+    "Tubing Head Temperature (deg F)": "float64",
+    "Water Cut (percent)": "float64",
+    "Liquid Rate (STB/day)": "float64",
+    "Gauge Depth (Measured) (feet)": "float64",
+    "Gauge Pressure (psia)": "float64",
+    "Reservoir Pressure (psia)": "float64",
+    "Gas Oil Ratio (scf/STB)": "float64",
+    "GOR Free (scf/STB)": "float64",
+    "Manifold Pressure (psia)": "float64",
+    "Choke Size (64ths in)": "float64"
+   },
+   "index_name": "Test"
+  },
+  "gl_valve_db": {
+   "__df__": {
+    "columns": [
+     "Manufacturer",
+     "Model",
+     "Specification",
+     "Valve type",
+     "Port (64ths in)",
+     "R value",
+     "Source"
+    ],
+    "index": [],
+    "data": []
+   },
+   "dtypes": {
+    "Manufacturer": "object",
+    "Model": "object",
+    "Specification": "object",
+    "Valve type": "object",
+    "Port (64ths in)": "float64",
+    "R value": "float64",
+    "Source": "object"
+   },
+   "index_name": null
+  },
+  "frac_fluid": {
+   "__df__": {
+    "columns": [
+     "Temperature (\u00b0F)",
+     "Flow behaviour index n",
+     "Consistency index K (lbf.s^n/ft2)"
+    ],
+    "index": [
+     0,
+     1,
+     2,
+     3,
+     4
+    ],
+    "data": [
+     [
+      60,
+      0.73,
+      0.0009
+     ],
+     [
+      100,
+      0.78,
+      0.0005
+     ],
+     [
+      120,
+      0.83,
+      0.00028
+     ],
+     [
+      140,
+      0.9,
+      0.00012
+     ],
+     [
+      160,
+      0.99,
+      4e-05
+     ]
+    ]
+   },
+   "dtypes": {
+    "Temperature (\u00b0F)": "int64",
+    "Flow behaviour index n": "float64",
+    "Consistency index K (lbf.s^n/ft2)": "float64"
+   },
+   "index_name": null
+  }
+ },
+ "extras": {
+  "vlp_selected": "pe5_style",
+  "vlp_u_accepted": 2.04713,
+  "vlp_adj_accepted": "PI = 1.42 STB/d/psi",
+  "vlp_matches": [
+   {
+    "correlation": "pe5_style",
+    "p1": 1.0426849609719504,
+    "p2": 1.003244170511333,
+    "std": 0.506586721824533,
+    "rmse_before": 142.6134969272557,
+    "rmse_after": 0.506586721824533,
+    "residuals": [
+     -0.506586721824533
+    ],
+    "n": 1,
+    "flags": []
+   },
+   {
+    "correlation": "pe2_style",
+    "p1": 1.1141170206899815,
+    "p2": 1.0088988554267067,
+    "std": 1.377477444534179,
+    "rmse_before": 384.22157180553404,
+    "rmse_after": 1.377477444534179,
+    "residuals": [
+     -1.377477444534179
+    ],
+    "n": 1,
+    "flags": [
+     "Parameter 1 = 1.114 is outside 0.9-1.1: the gravity term needs more than 10 % correction - check the PVT, water cut/GOR or gauge data, or choose another correlation."
+    ]
+   },
+   {
+    "correlation": "hagedorn_brown",
+    "p1": 1.1402994675662206,
+    "p2": 1.008608064930675,
+    "std": 1.7145182895742437,
+    "rmse_before": 470.4091139297989,
+    "rmse_after": 1.7145182895742437,
+    "residuals": [
+     -1.7145182895742437
+    ],
+    "n": 1,
+    "flags": [
+     "Parameter 1 = 1.140 is outside 0.9-1.1: the gravity term needs more than 10 % correction - check the PVT, water cut/GOR or gauge data, or choose another correlation."
+    ]
+   },
+   {
+    "correlation": "beggs_brill",
+    "p1": 1.1116264845195303,
+    "p2": 1.0100303596256768,
+    "std": 1.329338448753333,
+    "rmse_before": 375.8301912211373,
+    "rmse_after": 1.329338448753333,
+    "residuals": [
+     -1.329338448753333
+    ],
+    "n": 1,
+    "flags": [
+     "Parameter 1 = 1.112 is outside 0.9-1.1: the gravity term needs more than 10 % correction - check the PVT, water cut/GOR or gauge data, or choose another correlation."
+    ]
+   }
+  ],
+  "pvt_matched": true
+ }
+}
