@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PVT data QC: point exclusion for EOS regression</title>
+<style>
+.viz-root{color-scheme:light;--surface-0:#f4f4f2;--surface-1:#fcfcfb;--border:#e2e1dc;--text-primary:#0b0b0b;--text-secondary:#52514e;--muted-ink:#9a9993;--grid:#ecebe7;--series-1:#2a78d6;--critical:#d03b3b;--good:#0ca30c;--serious:#ec835a;--accent:#2a78d6;--neg-bg:#fbe3e3}
+@media (prefers-color-scheme:dark){:root:where(:not([data-theme="light"])) .viz-root{color-scheme:dark;--surface-0:#121211;--surface-1:#1a1a19;--border:#2f2f2d;--text-primary:#f0efec;--text-secondary:#c3c2b7;--muted-ink:#77766f;--grid:#262624;--series-1:#3987e5;--accent:#3987e5;--neg-bg:#4a1f1f}}
+:root[data-theme="dark"] .viz-root{color-scheme:dark;--surface-0:#121211;--surface-1:#1a1a19;--border:#2f2f2d;--text-primary:#f0efec;--text-secondary:#c3c2b7;--muted-ink:#77766f;--grid:#262624;--series-1:#3987e5;--accent:#3987e5;--neg-bg:#4a1f1f}
+*{box-sizing:border-box}
+body{margin:0}
+.viz-root{min-height:100vh;background:var(--surface-0);color:var(--text-primary);font:14px/1.45 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:20px clamp(12px,3vw,32px) 48px}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:15px;margin:0 0 10px}h3{font-size:14px;margin:0;flex:1}
+.sub{color:var(--text-secondary);margin:0 0 16px;max-width:900px}
+.muted{color:var(--text-secondary);font-weight:400}
+code{font-size:12px;background:var(--grid);padding:1px 4px;border-radius:4px}
+.toolbar{display:flex;flex-wrap:wrap;gap:10px 18px;align-items:end;background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+label{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--text-secondary)}
+input,select,textarea{font:inherit;color:var(--text-primary);background:var(--surface-0);border:1px solid var(--border);border-radius:6px;padding:5px 8px}
+input[type=range]{padding:0;width:130px}
+textarea{font:12px/1.4 ui-monospace,Menlo,Consolas,monospace;width:100%;resize:vertical}
+.toolbar input:not([type]),.fields input{width:120px}
+button{font:inherit;cursor:pointer;border:1px solid var(--border);background:var(--surface-1);color:var(--text-primary);border-radius:6px;padding:6px 12px}
+button:hover:not(:disabled){border-color:var(--accent)}button:disabled{opacity:.45;cursor:default}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--border);margin-bottom:14px;overflow-x:auto}
+.tabs button{border:0;border-bottom:2px solid transparent;border-radius:0;background:none;padding:8px 14px;color:var(--text-secondary);white-space:nowrap}
+.tabs button.on{border-bottom-color:var(--accent);color:var(--text-primary);font-weight:600}
+.cnt{margin-left:6px;font-size:12px;font-weight:600}
+.fl{color:var(--critical)}.ok{color:var(--good)}.exn{color:var(--text-secondary)}
+details.data{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:10px 14px;margin-bottom:14px}
+details.data>summary{cursor:pointer;font-weight:600}
+.fields{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.ta{margin-top:10px}.ta .muted{font-size:12px;margin-bottom:4px}
+.btns{display:flex;gap:8px;margin-top:10px}
+.stats{display:flex;flex-wrap:wrap;gap:10px;align-items:stretch;margin-bottom:14px}
+.stats>div{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:10px 16px;display:flex;flex-direction:column}
+.stats b{font-size:22px}.stats span{font-size:12px;color:var(--text-secondary)}
+.stats .fl b{color:var(--critical)}
+.stats .acts{flex-direction:row;gap:8px;align-items:center;margin-left:auto;background:none;border:0;padding:0}
+.flagbox{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:12px 14px;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(440px,1fr));gap:14px}
+@media (max-width:520px){.grid{grid-template-columns:1fr}}
+.card{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:12px 14px;min-width:0}
+.card.wide{grid-column:1/-1}
+.card header{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:6px}
+.badge{font-size:12px;font-weight:600}.badge.fl{color:var(--critical)}.badge.ok{color:var(--good)}
+.deg{flex-direction:row;align-items:center;gap:6px}.deg select{padding:2px 4px}
+.note{font-size:12px;color:var(--text-secondary);margin:0 0 6px}
+svg{width:100%;height:auto;display:block}
+.card.wide svg{max-width:760px}
+.grid line.grid{stroke:var(--grid);stroke-width:1}
+svg .grid{stroke:var(--grid)}svg .axis{stroke:var(--muted-ink)}
+svg .tick{font-size:11px;fill:var(--text-secondary)}svg .alabel{font-size:12px;fill:var(--text-secondary)}
+svg .fit{fill:none;stroke:var(--muted-ink);stroke-width:2}
+svg .calc{fill:none;stroke:var(--muted-ink);stroke-width:2;stroke-dasharray:5 4}
+svg .calcpt{fill:var(--surface-1);stroke:var(--muted-ink);stroke-width:1.5}
+.pt.in circle:first-child{fill:var(--series-1);stroke:var(--surface-1);stroke-width:2}
+.pt.fl path{fill:var(--critical);stroke:var(--surface-1);stroke-width:2}
+.pt.ex circle:first-child{fill:none;stroke:var(--muted-ink);stroke-width:1.5}.pt.ex path{stroke:var(--muted-ink);stroke-width:1.5}
+.hit{fill:transparent;cursor:pointer}
+.hit:hover{fill:var(--series-1);fill-opacity:.12}
+.hline{stroke-width:2}.hline.ex{stroke-dasharray:4 4}
+.hpt{stroke:var(--surface-1);stroke-width:1.5}
+.legend{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:12px;color:var(--text-secondary);margin:8px 0}
+.lg{display:inline-flex;align-items:center;gap:6px;padding:3px 8px;font-size:12px}.lg i{width:12px;height:12px;border-radius:3px;display:inline-block}
+.lg.fl{border-color:var(--critical)}.lg.ex{color:var(--muted-ink)}
+details summary{cursor:pointer;font-size:12px;color:var(--text-secondary);margin-top:6px}
+.tscroll{overflow-x:auto}
+table{border-collapse:collapse;font-size:12px;width:100%;margin-top:6px}
+th,td{text-align:left;padding:4px 8px;border-bottom:1px solid var(--border);vertical-align:top;font-variant-numeric:tabular-nums}
+th{color:var(--text-secondary);font-weight:600}
+tr.ex td{color:var(--muted-ink);text-decoration:line-through}tr.ex td:first-child,tr.ex td.why,tr.ex td:last-child{text-decoration:none}
+tr.fl td.why{color:var(--critical)}
+td.why{max-width:520px}
+.flags .info{color:var(--text-secondary)}.flags .rule,.flags .outlier{color:var(--critical)}
+table.mb td.neg{background:var(--neg-bg);color:var(--critical);font-weight:600}
+table.mb tr.sub td{color:var(--text-secondary)}
+.notes p{margin:0 0 8px;color:var(--text-secondary)}
+.empty{background:var(--surface-1);border:1px dashed var(--border);border-radius:10px;padding:28px;text-align:center;color:var(--text-secondary)}
+#tip{position:fixed;z-index:10;pointer-events:none;white-space:pre-line;background:var(--text-primary);color:var(--surface-1);font-size:12px;padding:6px 9px;border-radius:6px;max-width:340px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.key{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--text-secondary);margin:0 0 12px}
+.key span{display:inline-flex;align-items:center;gap:6px}.key svg{width:auto;flex:none}
+.method{background:var(--surface-1);border:1px solid var(--border);border-radius:10px;padding:12px 16px;margin-top:14px;font-size:13px}
+.method h2{margin-top:6px}.method li{margin-bottom:4px}
+</style>
+</head>
+<body>
+<div class="viz-root">
+  <h1>PVT data QC: which points to exclude from the EOS regression</h1>
+  <p class="sub">Paste CCE, CVD and differential liberation data. Each property is checked against a robust trend line and against physical consistency rules (Y-function, two-phase Z from moles produced, CVD material balance with a Hoffman plot, DL oil-density mass balance). Click any point to exclude or include it, then copy the weights table for PVTp.</p>
+
+  <div class="toolbar">
+    <label>Pressure units<select id="g-p"><option value="psia">psia</option><option value="bar">bara</option></select></label>
+    <label>Temperature units<select id="g-t"><option value="F">°F</option><option value="C">°C</option></select></label>
+    <label>Outlier threshold, robust z: <b id="g-kv"></b><input id="g-k" type="range" min="2" max="6" step="0.5"></label>
+    <label>Two-phase Z tolerance (%)<input id="g-z2" inputmode="decimal"></label>
+    <label>Density balance tolerance (%)<input id="g-rho" inputmode="decimal"></label>
+    <label>Min. Hoffman R²<input id="g-r2" inputmode="decimal"></label>
+    <button data-act="reset" style="margin-left:auto">Reset everything</button>
+  </div>
+
+  <div class="key" aria-label="Marker key">
+    <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="var(--series-1)"/></svg>Included</span>
+    <span><svg width="16" height="16"><path d="M8 1L15 8L8 15L1 8Z" fill="var(--critical)"/></svg>Flagged (still included)</span>
+    <span><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="var(--muted-ink)" stroke-width="1.5"/><path d="M3.5 3.5L10.5 10.5M10.5 3.5L3.5 10.5" stroke="var(--muted-ink)" stroke-width="1.5"/></svg>Excluded</span>
+    <span><svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="var(--muted-ink)" stroke-width="2"/></svg>Robust trend (fitted to included points)</span>
+    <span><svg width="24" height="10"><line x1="0" y1="5" x2="24" y2="5" stroke="var(--muted-ink)" stroke-width="2" stroke-dasharray="5 4"/></svg>Calculated from material balance</span>
+  </div>
+
+  <nav class="tabs" role="tablist">
+    <button data-tab="CCE" role="tab">CCE<span class="cnt"></span></button>
+    <button data-tab="CVD" role="tab">CVD<span class="cnt"></span></button>
+    <button data-tab="DL" role="tab">Differential liberation<span class="cnt"></span></button>
+    <button data-tab="Export" role="tab">Export weights</button>
+  </nav>
+
+  <section class="panel" id="tab-CCE"><details class="data" open><summary>CCE data and settings</summary><div id="data-CCE"></div></details><div id="res-CCE"></div></section>
+  <section class="panel" id="tab-CVD" hidden><details class="data" open><summary>CVD data and settings</summary><div id="data-CVD"></div></details><div id="res-CVD"></div></section>
+  <section class="panel" id="tab-DL" hidden><details class="data" open><summary>Differential liberation data and settings</summary><div id="data-DL"></div></details><div id="res-DL"></div></section>
+  <section class="panel" id="tab-Export" hidden>
+    <div class="flagbox">
+      <h2>Excluded points</h2><div id="exsum"></div>
+      <p class="muted">In PVTp, give these points zero weight (or deselect them) in the regression data, then re-run the regression. Everything else keeps weight 1; adjust weights on included points as you normally would.</p>
+    </div>
+    <div class="flagbox">
+      <h2>Weights table (CSV)</h2>
+      <div class="btns" style="margin:0 0 8px"><button class="primary" data-act="copy">Copy CSV</button><label style="flex-direction:row;align-items:center;gap:6px"><input type="checkbox" id="onlyEx"> Only excluded points</label></div>
+      <textarea id="csv" rows="16" readonly></textarea>
+    </div>
+    <div class="method">
+      <h2>How points are flagged</h2>
+      <ul>
+        <li><b>Off-trend (robust z).</b> Each property is fitted against pressure with a robust polynomial (iteratively re-weighted, Tukey bisquare), so one bad point cannot drag the line toward itself. Residuals are scaled by the median absolute deviation, with a floor at half the last reported digit so rounding is never flagged. Points with |z| above the threshold are flagged. Excluded points are left out of the fit. Change the trend order per chart if the curve shape needs it.</li>
+        <li><b>CCE.</b> V/Vsat must be ≤ 1 above and ≥ 1 below Psat and must grow as pressure drops. For oils the Y-function should be a straight line; points close to Psat are marked as information only, because Y is very sensitive there. For condensates, P·Vrel (proportional to two-phase Z) and liquid dropout are trend-checked.</li>
+        <li><b>CVD.</b> Liquid dropout, gas Z and moles produced are trend-checked. Two-phase Z is compared with p/Z₂ₚₕ = (Pd/Zd)(1 − nₚ). With gas compositions, liquid compositions are back-calculated stage by stage; a negative mole fraction, a curved Hoffman line, or a wrong-sign slope flags that stage's gas analysis.</li>
+        <li><b>DL.</b> Rs and Bo must fall as pressure drops below Pb; Bo vs Rs should be nearly straight; oil density is compared with a mass balance built from residual-oil density, ΔRs and liberated gas gravity.</li>
+        <li><b>Use judgement.</b> A flag is a reason to look, not a verdict. Exclude a point when there is a physical reason it is wrong, not only because the EOS can't match it.</li>
+      </ul>
+    </div>
+  </section>
+  <div id="tip" hidden></div>
+</div>
+<script>
+// ===== PVT QC core: parsing, robust fitting, consistency checks =====
+const PVT = (() => {
+  // ---------- parsing ----------
+  const ALIASES = {
+    P: ['p', 'pressure', 'pres'],
+    Vrel: ['vrel', 'relvol', 'relativevolume', 'vvsat', 'rv', 'relvolume'],
+    LDO: ['ldo', 'liquiddropout', 'liqdropout', 'dropout', 'sl', 'liquidsat', 'liquidvolume', 'vl'],
+    Z: ['z', 'zfactor', 'zgas', 'gasz', 'zg'],
+    Z2ph: ['z2ph', 'ztwophase', 'z2phase', 'twophasez', 'z2'],
+    Np: ['np', 'cumnp', 'cummoles', 'molesproduced', 'cummolesproduced', 'nprod', 'cumnprod'],
+    Bo: ['bo', 'bod', 'fvf'],
+    Rs: ['rs', 'rsd', 'gor'],
+    RhoO: ['rhoo', 'oildensity', 'density', 'rho', 'dens'],
+    GasGrav: ['gasgravity', 'gg', 'sg', 'gasgrav', 'gammag'],
+  };
+  const norm = s => String(s).toLowerCase().replace(/[^a-z0-9]/g, '');
+  function canon(h) {
+    const n = norm(h);
+    for (const [k, list] of Object.entries(ALIASES)) if (list.includes(n)) return k;
+    return null;
+  }
+  function splitLine(line) {
+    if (line.includes('\t')) return line.split('\t');
+    if (line.includes(';')) return line.split(';');
+    if (line.includes(',')) return line.split(',');
+    return line.trim().split(/\s+/);
+  }
+  function num(s) {
+    if (s === undefined) return null;
+    const t = String(s).trim();
+    if (t === '' || t === '-' || /^n\/?a$/i.test(t)) return null;
+    const v = parseFloat(t);
+    return isFinite(v) ? v : null;
+  }
+  function parseTable(text) {
+    const lines = String(text || '').split(/\r?\n/).map(l => l.replace(/#.*$/, '')).filter(l => l.trim());
+    if (!lines.length) return { rows: [], cols: [], unknown: [] };
+    const head = splitLine(lines[0]).map(h => h.trim());
+    const cols = head.map(canon);
+    const unknown = head.filter((h, i) => !cols[i]);
+    const rows = [];
+    for (const l of lines.slice(1)) {
+      const cells = splitLine(l);
+      const r = {};
+      cols.forEach((c, i) => { if (c) r[c] = num(cells[i]); });
+      if (r.P != null) rows.push(r);
+    }
+    rows.sort((a, b) => b.P - a.P);
+    return { rows, cols: cols.filter(Boolean), unknown };
+  }
+  // composition table: first column component name, next column Feed (z), then one column per stage pressure
+  function parseComp(text) {
+    const lines = String(text || '').split(/\r?\n/).map(l => l.replace(/#.*$/, '')).filter(l => l.trim());
+    if (lines.length < 2) return null;
+    const head = splitLine(lines[0]).map(h => h.trim());
+    const stageP = head.slice(2).map(num);
+    const comps = [], z = [], y = stageP.map(() => []);
+    for (const l of lines.slice(1)) {
+      const c = splitLine(l).map(s => s.trim());
+      comps.push(c[0]);
+      z.push(num(c[1]) ?? 0);
+      stageP.forEach((_, j) => y[j].push(num(c[j + 2]) ?? 0));
+    }
+    const nz = v => { const s = v.reduce((a, b) => a + b, 0); return s > 0 ? v.map(x => x / s) : v; };
+    return { comps, z: nz(z), stages: stageP.map((P, j) => ({ P, y: nz(y[j]), rawSum: y[j].reduce((a, b) => a + b, 0) })).filter(s => s.P != null) };
+  }
+
+  // ---------- robust polynomial fit (IRLS, Tukey bisquare) ----------
+  function solve(A, b) {
+    const n = b.length, M = A.map((r, i) => [...r, b[i]]);
+    for (let c = 0; c < n; c++) {
+      let p = c; for (let r = c + 1; r < n; r++) if (Math.abs(M[r][c]) > Math.abs(M[p][c])) p = r;
+      [M[c], M[p]] = [M[p], M[c]];
+      if (Math.abs(M[c][c]) < 1e-14) return null;
+      for (let r = 0; r < n; r++) if (r !== c) { const f = M[r][c] / M[c][c]; for (let k = c; k <= n; k++) M[r][k] -= f * M[c][k]; }
+    }
+    return M.map((r, i) => r[n] / r[i]);
+  }
+  function wls(x, y, w, deg) {
+    const m = deg + 1, A = Array.from({ length: m }, () => Array(m).fill(0)), b = Array(m).fill(0);
+    for (let i = 0; i < x.length; i++) {
+      const pw = []; for (let k = 0; k < m; k++) pw.push(Math.pow(x[i], k));
+      for (let r = 0; r < m; r++) { b[r] += w[i] * pw[r] * y[i]; for (let c = 0; c < m; c++) A[r][c] += w[i] * pw[r] * pw[c]; }
+    }
+    return solve(A, b);
+  }
+  const median = a => { const s = [...a].sort((p, q) => p - q), n = s.length; return n ? (n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2) : 0; };
+  function robustPoly(x, y, deg, floor = 0) {
+    const n = x.length;
+    deg = Math.max(0, Math.min(deg, n - 2));
+    const lo = Math.min(...x), hi = Math.max(...x), mid = (lo + hi) / 2, half = (hi - lo) / 2 || 1;
+    const t = x.map(v => (v - mid) / half);
+    let w = Array(n).fill(1), coef = null, scale = 0;
+    for (let it = 0; it < 30; it++) {
+      const c = wls(t, y, w, deg); if (!c) break; coef = c;
+      const r = t.map((ti, i) => y[i] - c.reduce((s, ck, k) => s + ck * Math.pow(ti, k), 0));
+      scale = 1.4826 * median(r.map(Math.abs));
+      const yr = Math.max(...y.map(Math.abs)) || 1;
+      if (scale < 1e-9 * yr) break;
+      w = r.map(ri => { const u = ri / (4.685 * scale); return Math.abs(u) < 1 ? (1 - u * u) ** 2 : 0; });
+    }
+    if (!coef) return null;
+    const predict = v => { const tt = (v - mid) / half; return coef.reduce((s, ck, k) => s + ck * Math.pow(tt, k), 0); };
+    const r = x.map((v, i) => y[i] - predict(v));
+    const dof = Math.max(1, n - deg - 1);
+    let s = 1.4826 * median(r.map(Math.abs)) * Math.sqrt(n / dof);
+    const yr = Math.max(...y.map(Math.abs)) || 1;
+    s = Math.max(s, 1e-4 * yr, floor, 1e-12);
+    return { predict, deg, scale: s, lo, hi };
+  }
+  function linFit(x, y) {
+    const n = x.length; if (n < 2) return null;
+    const mx = x.reduce((a, b) => a + b, 0) / n, my = y.reduce((a, b) => a + b, 0) / n;
+    let sxx = 0, sxy = 0, syy = 0;
+    for (let i = 0; i < n; i++) { sxx += (x[i] - mx) ** 2; sxy += (x[i] - mx) * (y[i] - my); syy += (y[i] - my) ** 2; }
+    const b = sxx ? sxy / sxx : 0, a = my - b * mx;
+    return { a, b, r2: syy ? (sxy * sxy) / (sxx * syy) : 1 };
+  }
+
+  // ---------- generic helpers ----------
+  function makeCtx(test, excluded, k) {
+    const flags = {}, series = [], notes = [];
+    const key = (prop, P) => `${test}|${prop}|${+P.toFixed(4)}`;
+    const isEx = keys => keys.length > 0 && keys.every(kk => excluded[kk]);
+    const flag = (kk, msg, level = 'outlier') => { (flags[kk] = flags[kk] || []).push({ msg, level }); };
+    // fit a series; pts: [{x,y,P,keys}]
+    function fitSeries(o) {
+      const pts = o.pts.filter(p => p.x != null && p.y != null && isFinite(p.x) && isFinite(p.y));
+      const inc = pts.filter(p => !isEx(p.keys));
+      let fit = null;
+      const decs = v => { const t = String(v); if (/e/i.test(t)) return 6; const i = t.indexOf('.'); return i < 0 ? 0 : t.length - i - 1; };
+      const floor = o.derived ? 0 : 0.5 * Math.pow(10, -Math.max(0, ...inc.map(p => decs(p.y))));
+      if (inc.length >= 3) fit = robustPoly(inc.map(p => p.x), inc.map(p => p.y), o.deg, floor);
+      if (fit) {
+        for (const p of pts) {
+          p.fit = fit.predict(p.x); p.res = p.y - p.fit; p.z = p.res / fit.scale;
+          if (Math.abs(p.z) > k && !isEx(p.keys)) p.keys.forEach(kk => flag(kk, `${o.short || o.title}: off-trend, robust z = ${p.z.toFixed(1)}`));
+        }
+        const N = 60, curve = [];
+        for (let i = 0; i <= N; i++) { const xv = fit.lo + (fit.hi - fit.lo) * i / N; curve.push([xv, fit.predict(xv)]); }
+        o.curve = curve; o.usedDeg = fit.deg;
+      } else if (pts.length) o.note = (o.note ? o.note + ' ' : '') + 'Need at least 3 included points to fit a trend.';
+      o.pts = pts; o.kind = o.kind || 'fit';
+      series.push(o); return o;
+    }
+    return { flags, series, notes, key, isEx, flag, fitSeries };
+  }
+  const has = (rows, c) => rows.filter(r => r[c] != null).length;
+
+  // ---------- CCE ----------
+  function analyzeCCE(text, st, excluded, degs, k) {
+    const { rows, unknown } = parseTable(text);
+    const C = makeCtx('CCE', excluded, k);
+    if (unknown.length) C.notes.push(`Ignored columns: ${unknown.join(', ')}`);
+    const Ps = st.Psat, oil = st.fluid !== 'gas';
+    if (!rows.length) return { ...C, rows };
+    if (!(Ps > 0)) { C.notes.push('Enter the saturation pressure to run CCE checks.'); return { ...C, rows }; }
+    const above = rows.filter(r => r.P >= Ps - 1e-9), below = rows.filter(r => r.P < Ps - 1e-9);
+    // rules on Vrel
+    rows.forEach(r => {
+      if (r.Vrel == null) return;
+      const kk = C.key('Vrel', r.P);
+      if (r.P > Ps && r.Vrel > 1.0005) C.flag(kk, 'Relative volume > 1 above Psat', 'rule');
+      if (r.P < Ps && r.Vrel < 0.9995) C.flag(kk, 'Relative volume < 1 below Psat', 'rule');
+    });
+    for (let i = 1; i < rows.length; i++) {
+      const a = rows[i - 1], b = rows[i];
+      if (a.Vrel != null && b.Vrel != null && b.Vrel < a.Vrel - 1e-6) C.flag(C.key('Vrel', b.P), 'Relative volume decreases as pressure drops', 'rule');
+    }
+    // Vrel single phase
+    if (has(above, 'Vrel') >= 3) C.fitSeries({ id: 'cce_vrel_1ph', title: 'Relative volume above Psat (single phase)', short: 'Vrel (1-phase)', xLabel: 'Pressure', yLabel: 'V/Vsat', deg: degs.cce_vrel_1ph ?? 2,
+      pts: above.filter(r => r.Vrel != null).map(r => ({ x: r.P, y: r.Vrel, P: r.P, keys: [C.key('Vrel', r.P)] })) });
+    if (oil) {
+      const yp = below.filter(r => r.Vrel != null && r.Vrel > 1).map(r => {
+        const Y = (Ps - r.P) / (r.P * (r.Vrel - 1));
+        const kk = C.key('Vrel', r.P);
+        if ((Ps - r.P) / Ps < 0.05) C.flag(kk, 'Within 5% of Psat: Y-function is very sensitive to small volume errors here', 'info');
+        return { x: r.P, y: Y, P: r.P, keys: [kk] };
+      });
+      if (yp.length) C.fitSeries({ id: 'cce_y', title: 'Y-function (below Psat): should be a straight line', short: 'Y-function', derived: true, xLabel: 'Pressure', yLabel: 'Y = (Psat−P) / [P·(Vrel−1)]', deg: degs.cce_y ?? 1, pts: yp,
+        note: 'Y = (Psat − P) / (P·(V/Vsat − 1)). Lab points normally fall on a straight line; scatter close to Psat is common and is marked as information only.' });
+    } else {
+      if (has(below, 'Vrel') >= 3) C.fitSeries({ id: 'cce_pv', title: 'P·Vrel / Psat below Pdew (proportional to two-phase Z)', short: 'P·Vrel', derived: true, xLabel: 'Pressure', yLabel: 'P·Vrel / Psat', deg: degs.cce_pv ?? 3,
+        pts: below.filter(r => r.Vrel != null).map(r => ({ x: r.P, y: r.P * r.Vrel / Ps, P: r.P, keys: [C.key('Vrel', r.P)] })) });
+      if (has(rows, 'LDO')) {
+        rows.forEach(r => { if (r.LDO == null) return; const kk = C.key('LDO', r.P);
+          if (r.LDO < 0) C.flag(kk, 'Negative liquid dropout', 'rule');
+          if (r.P > Ps + 1e-9 && r.LDO > 0.01) C.flag(kk, 'Liquid dropout above the dew point', 'rule'); });
+        C.fitSeries({ id: 'cce_ldo', title: 'Liquid dropout (CCE)', short: 'CCE liquid dropout', xLabel: 'Pressure', yLabel: 'Liquid dropout (%)', deg: degs.cce_ldo ?? 3,
+          pts: rows.filter(r => r.LDO != null && r.P <= Ps + 1e-9).map(r => ({ x: r.P, y: r.LDO, P: r.P, keys: [C.key('LDO', r.P)] })) });
+      }
+    }
+    if (has(above, 'Z') >= 3) C.fitSeries({ id: 'cce_z', title: 'Z-factor above Psat', short: 'CCE Z', xLabel: 'Pressure', yLabel: 'Z', deg: degs.cce_z ?? 2,
+      pts: above.filter(r => r.Z != null).map(r => ({ x: r.P, y: r.Z, P: r.P, keys: [C.key('Z', r.P)] })) });
+    return { ...C, rows };
+  }
+
+  // ---------- CVD ----------
+  const HOFF = { // Tc (R), Pc (psia), Tb (R)
+    N2: [227.3, 493.0, 139.3], CO2: [547.6, 1071.0, 350.5], H2S: [672.4, 1300.0, 383.1], C1: [343.0, 667.8, 201.0], C2: [549.8, 707.8, 332.2],
+    C3: [665.7, 616.3, 416.0], IC4: [734.7, 529.1, 470.6], NC4: [765.3, 550.7, 490.8], IC5: [828.8, 490.4, 541.8], NC5: [845.4, 488.6, 556.6], C6: [913.4, 436.9, 615.4],
+  };
+  function analyzeCVD(text, compText, st, excluded, degs, k) {
+    const { rows, unknown } = parseTable(text);
+    const C = makeCtx('CVD', excluded, k);
+    if (unknown.length) C.notes.push(`Ignored columns: ${unknown.join(', ')}`);
+    if (!rows.length) return { ...C, rows };
+    const Pd = st.Pd;
+    if (!(Pd > 0)) { C.notes.push('Enter the dew point pressure to run CVD checks.'); return { ...C, rows }; }
+    let Zd = st.Zd;
+    if (!(Zd > 0)) { const r = rows.find(r => Math.abs(r.P - Pd) < 1e-6 && r.Z != null); if (r) Zd = r.Z; }
+    const stg = rows.filter(r => r.P <= Pd + 1e-9);
+    // rules
+    stg.forEach(r => {
+      if (r.LDO != null && r.LDO < 0) C.flag(C.key('LDO', r.P), 'Negative liquid dropout', 'rule');
+      if (r.Z != null && r.Z <= 0) C.flag(C.key('Z', r.P), 'Non-positive Z', 'rule');
+    });
+    for (let i = 1; i < stg.length; i++) if (stg[i].Np != null && stg[i - 1].Np != null && stg[i].Np < stg[i - 1].Np) C.flag(C.key('Np', stg[i].P), 'Cumulative moles produced decreases', 'rule');
+    if (has(stg, 'LDO') >= 3) C.fitSeries({ id: 'cvd_ldo', title: 'Liquid dropout (CVD)', short: 'CVD liquid dropout', xLabel: 'Pressure', yLabel: 'Liquid dropout (% of Vd)', deg: degs.cvd_ldo ?? 3,
+      pts: stg.filter(r => r.LDO != null).map(r => ({ x: r.P, y: r.LDO, P: r.P, keys: [C.key('LDO', r.P)] })) });
+    if (has(rows, 'Z') >= 3) C.fitSeries({ id: 'cvd_z', title: 'Gas Z-factor (CVD)', short: 'CVD gas Z', xLabel: 'Pressure', yLabel: 'Z', deg: degs.cvd_z ?? 3,
+      pts: rows.filter(r => r.Z != null).map(r => ({ x: r.P, y: r.Z, P: r.P, keys: [C.key('Z', r.P)] })) });
+    if (has(stg, 'Np') >= 3) C.fitSeries({ id: 'cvd_np', title: 'Cumulative moles produced', short: 'Cum. moles produced', xLabel: 'Pressure', yLabel: 'np (% of initial)', deg: degs.cvd_np ?? 3,
+      pts: stg.filter(r => r.Np != null).map(r => ({ x: r.P, y: r.Np, P: r.P, keys: [C.key('Np', r.P)] })) });
+    // two-phase Z consistency: p/Z2 = (pd/Zd)(1 - np)
+    if (Zd > 0 && has(stg, 'Np') >= 2) {
+      const tol = st.tolZ2 ?? 1.0;
+      const pts = stg.filter(r => r.Np != null && r.P < Pd).map(r => {
+        const calc = r.P / ((Pd / Zd) * (1 - r.Np / 100));
+        const keys = [C.key('Np', r.P)]; if (r.Z2ph != null) keys.push(C.key('Z2ph', r.P));
+        const p = { x: r.P, y: r.Z2ph, calc, P: r.P, keys };
+        if (r.Z2ph != null) { const d = 100 * (r.Z2ph - calc) / calc; p.dev = d;
+          if (Math.abs(d) > tol && !C.isEx(keys)) keys.forEach(kk => C.flag(kk, `Two-phase Z ${r.Z2ph.toFixed(4)} vs ${calc.toFixed(4)} from moles produced (${d > 0 ? '+' : ''}${d.toFixed(2)}%)`, 'rule')); }
+        return p;
+      });
+      C.series.push({ id: 'cvd_z2', kind: 'compare', title: 'Two-phase Z: reported vs material balance', xLabel: 'Pressure', yLabel: 'Z two-phase', pts: pts.filter(p => p.y != null), calcPts: pts,
+        note: `Calculated from p/Z₂ₚₕ = (Pd/Zd)(1 − np). Disagreement above ${tol}% points to an error in Z₂ₚₕ or in the moles produced. Zd used = ${(+Zd).toFixed(4)}.` });
+    }
+    // composition material balance + Hoffman
+    const comp = parseComp(compText);
+    if (comp && comp.stages.length) {
+      if (!(Zd > 0)) C.notes.push('Zd is needed for the composition material balance.');
+      else C.mb = cvdMaterialBalance(comp, stg, Pd, Zd, st, C);
+    }
+    return { ...C, rows };
+  }
+  function cvdMaterialBalance(comp, stg, Pd, Zd, st, C) {
+    const T = st.tUnit === 'C' ? (st.T * 9 / 5 + 32 + 459.67) : (st.T + 459.67);
+    const pPsia = p => st.pUnit === 'bar' ? p * 14.5038 : p;
+    const nc = comp.comps.length;
+    let zrem = [...comp.z], npPrev = 0;
+    const out = [], hoff = [];
+    const findY = P => comp.stages.find(s => Math.abs(s.P - P) < Math.max(0.5, 1e-4 * P));
+    for (const r of stg) {
+      if (r.P >= Pd - 1e-9) continue;
+      const s = findY(r.P);
+      if (!s || r.LDO == null || r.Z == null || r.Np == null) {
+        out.push({ P: r.P, stop: true, msg: `Stopped at ${r.P}: needs gas composition, liquid dropout, gas Z and moles produced at every stage.` });
+        break;
+      }
+      const np = r.Np / 100, dnp = np - npPrev, SL = r.LDO / 100;
+      const ng = (r.P / Pd) * (Zd / r.Z) * (1 - SL), nrem = 1 - np, nL = nrem - ng;
+      zrem = zrem.map((zi, i) => zi - dnp * s.y[i]);
+      const x = zrem.map((zi, i) => (zi - ng * s.y[i]) / nL);
+      const keys = [C.key('Comp', r.P)];
+      const st0 = { P: r.P, ng, nL, x, y: s.y, negs: [] };
+      if (Math.abs(s.rawSum - 100) > 0.5 && Math.abs(s.rawSum - 1) > 0.005) C.flag(keys[0], `Gas composition sums to ${s.rawSum.toFixed(3)} (normalised)`, 'info');
+      if (nL <= 0) C.flag(keys[0], 'Material balance gives zero or negative liquid moles', 'rule');
+      else x.forEach((xi, i) => { if (xi < 0) { st0.negs.push(comp.comps[i]); } });
+      if (st0.negs.length) C.flag(keys[0], `Negative liquid mole fraction from material balance: ${st0.negs.join(', ')}`, 'rule');
+      // Hoffman
+      const hp = [];
+      comp.comps.forEach((nm, i) => {
+        const h = HOFF[normComp(nm)]; if (!h || !(x[i] > 0) || !(s.y[i] > 0)) return;
+        const [Tc, Pc, Tb] = h, b = Math.log10(Pc / 14.696) / (1 / Tb - 1 / Tc);
+        hp.push({ comp: nm, F: b * (1 / Tb - 1 / T), lkp: Math.log10((s.y[i] / x[i]) * pPsia(r.P)) });
+      });
+      const lf = linFit(hp.map(p => p.F), hp.map(p => p.lkp));
+      if (lf && hp.length >= 4) {
+        st0.r2 = lf.r2;
+        if (lf.r2 < (st.r2min ?? 0.98) && !C.isEx(keys)) C.flag(keys[0], `Hoffman plot not linear (R² = ${lf.r2.toFixed(3)})`, 'rule');
+        if (lf.b < 0 && !C.isEx(keys)) C.flag(keys[0], 'Hoffman slope has the wrong sign (K-values increase with heavier components)', 'rule');
+      }
+      hoff.push({ P: r.P, keys, pts: hp, fit: lf });
+      out.push(st0); npPrev = np;
+    }
+    return { comps: comp.comps, stages: out, hoff };
+  }
+  function normComp(n) {
+    const s = String(n).toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const alias = { METHANE: 'C1', ETHANE: 'C2', PROPANE: 'C3', ISOBUTANE: 'IC4', IBUTANE: 'IC4', NBUTANE: 'NC4', ISOPENTANE: 'IC5', IPENTANE: 'IC5', NPENTANE: 'NC5', HEXANE: 'C6', NC6: 'C6', C6H14: 'C6', NITROGEN: 'N2', I4: 'IC4', N4: 'NC4', I5: 'IC5', N5: 'NC5' };
+    return HOFF[s] ? s : (alias[s] || null);
+  }
+
+  // ---------- DL ----------
+  function analyzeDL(text, st, excluded, degs, k) {
+    const { rows, unknown } = parseTable(text);
+    const C = makeCtx('DL', excluded, k);
+    if (unknown.length) C.notes.push(`Ignored columns: ${unknown.join(', ')}`);
+    if (!rows.length) return { ...C, rows };
+    const Pb = st.Pb;
+    if (!(Pb > 0)) { C.notes.push('Enter the bubble point pressure to run DL checks.'); return { ...C, rows }; }
+    const above = rows.filter(r => r.P > Pb + 1e-9), below = rows.filter(r => r.P <= Pb + 1e-9);
+    // rules
+    for (let i = 1; i < below.length; i++) {
+      const a = below[i - 1], b = below[i];
+      if (a.Rs != null && b.Rs != null && b.Rs > a.Rs + 1e-9) C.flag(C.key('Rs', b.P), 'Rs increases as pressure drops below Pb', 'rule');
+      if (a.Bo != null && b.Bo != null && b.Bo > a.Bo + 1e-9) C.flag(C.key('Bo', b.P), 'Bo increases as pressure drops below Pb', 'rule');
+    }
+    for (let i = 1; i < above.length + 1 && i < rows.length; i++) {
+      const a = rows[i - 1], b = rows[i]; if (a.P <= Pb + 1e-9) break;
+      if (a.Bo != null && b.Bo != null && b.Bo < a.Bo - 1e-9) C.flag(C.key('Bo', a.P), 'Bo should rise as pressure falls towards Pb', 'rule');
+    }
+    const rsb = (below.find(r => r.Rs != null) || {}).Rs;
+    above.forEach(r => { if (r.Rs != null && rsb != null && Math.abs(r.Rs - rsb) > 1e-3 * Math.max(1, rsb)) C.flag(C.key('Rs', r.P), 'Rs above Pb differs from Rsb', 'rule'); });
+    const pts = (rs, prop) => rs.filter(r => r[prop] != null).map(r => ({ x: r.P, y: r[prop], P: r.P, keys: [C.key(prop, r.P)] }));
+    if (has(above, 'Bo') >= 3) C.fitSeries({ id: 'dl_bo_1ph', title: 'Bo above Pb', short: 'Bo (above Pb)', xLabel: 'Pressure', yLabel: 'Bo', deg: degs.dl_bo_1ph ?? 2, pts: pts(above.concat(below.slice(0, 1)), 'Bo') });
+    if (has(below, 'Bo') >= 3) C.fitSeries({ id: 'dl_bo', title: 'Bo below Pb', short: 'Bo', xLabel: 'Pressure', yLabel: 'Bo', deg: degs.dl_bo ?? 3, pts: pts(below, 'Bo') });
+    if (has(below, 'Rs') >= 3) C.fitSeries({ id: 'dl_rs', title: 'Solution GOR below Pb', short: 'Rs', xLabel: 'Pressure', yLabel: `Rs (${st.rsUnit || 'scf/STB'})`, deg: degs.dl_rs ?? 3, pts: pts(below, 'Rs') });
+    const both = below.filter(r => r.Bo != null && r.Rs != null);
+    if (both.length >= 3) C.fitSeries({ id: 'dl_bors', title: 'Bo vs Rs: should be close to a straight line', short: 'Bo–Rs', xLabel: `Rs (${st.rsUnit || 'scf/STB'})`, yLabel: 'Bo', deg: degs.dl_bors ?? 1,
+      pts: both.map(r => ({ x: r.Rs, y: r.Bo, P: r.P, keys: [C.key('Bo', r.P), C.key('Rs', r.P)] })), note: 'Each point is one DL stage; an off-line stage means its Bo or its Rs is suspect. Clicking a point toggles both.' });
+    if (has(above, 'RhoO') >= 3) C.fitSeries({ id: 'dl_rho_1ph', title: 'Oil density above Pb', short: 'Oil density (above Pb)', xLabel: 'Pressure', yLabel: 'Oil density', deg: degs.dl_rho_1ph ?? 2, pts: pts(above.concat(below.slice(0, 1)), 'RhoO') });
+    if (has(below, 'RhoO') >= 3) C.fitSeries({ id: 'dl_rho', title: 'Oil density below Pb', short: 'Oil density', xLabel: 'Pressure', yLabel: 'Oil density', deg: degs.dl_rho ?? 4, pts: pts(below, 'RhoO') });
+    const gz = below.filter(r => r.P < Pb);
+    if (has(gz, 'Z') >= 3) C.fitSeries({ id: 'dl_z', title: 'Liberated gas Z-factor', short: 'DL gas Z', xLabel: 'Pressure', yLabel: 'Z', deg: degs.dl_z ?? 2, pts: pts(gz, 'Z') });
+    if (has(gz, 'GasGrav') >= 3) C.fitSeries({ id: 'dl_gg', title: 'Liberated gas gravity', short: 'Gas gravity', xLabel: 'Pressure', yLabel: 'Gas gravity (air = 1)', deg: degs.dl_gg ?? 2, pts: pts(gz, 'GasGrav') });
+    // density material balance
+    if (st.rhoSTO > 0 && has(rows, 'RhoO') && has(rows, 'Bo') === rows.length && has(below, 'Rs') === below.length) {
+      const rsF = st.rsUnit === 'sm3/sm3' ? 5.6146 : 1;
+      const gOK = below.slice(1).every(r => r.GasGrav != null);
+      if (!gOK) C.notes.push('Density material balance needs gas gravity at every stage below Pb.');
+      else {
+        const mSTO = 158.987 * st.rhoSTO; // kg per residual STB
+        const n = rows.length, mass = rows.map(() => mSTO);
+        if (rows[n - 1].Rs > 0) C.notes.push('Density mass balance assumes the last DL stage has Rs = 0 (residual oil); your last stage has Rs > 0, so calculated densities are too low.');
+        let acc = 0;
+        for (let i = n - 2; i >= 0; i--) {
+          const a = rows[i], b = rows[i + 1];
+          if (b.P <= Pb + 1e-9 && a.Rs != null && b.Rs != null && b.GasGrav != null) acc += 0.034636 * (a.Rs - b.Rs) * rsF * b.GasGrav;
+          mass[i] = mSTO + acc;
+        }
+        const tol = st.tolRho ?? 1.0, cmp = [];
+        rows.forEach((r, i) => {
+          if (r.RhoO == null) return;
+          const calc = mass[i] / (r.Bo * 158.987) * (st.rhoUnit === 'kg/m3' ? 1000 : 1);
+          const d = 100 * (r.RhoO - calc) / calc;
+          const keys = [C.key('RhoO', r.P)];
+          if (Math.abs(d) > tol && !C.isEx(keys)) C.flag(keys[0], `Oil density ${r.RhoO} vs ${calc.toFixed(4)} from mass balance (${d > 0 ? '+' : ''}${d.toFixed(2)}%)`, 'rule');
+          cmp.push({ x: r.P, y: r.RhoO, calc, dev: d, P: r.P, keys });
+        });
+        C.series.push({ id: 'dl_rhomb', kind: 'compare', title: 'Oil density: reported vs mass balance', xLabel: 'Pressure', yLabel: 'Oil density', pts: cmp, calcPts: cmp,
+          note: `Mass per residual barrel = stock-tank oil mass + Σ ΔRs·γg·(air density), divided by Bo. Uses residual oil density ${st.rhoSTO} g/cc. Disagreement above ${tol}% points to an error in density, Bo, Rs or gas gravity.` });
+      }
+    }
+    return { ...C, rows };
+  }
+
+  return { parseTable, parseComp, robustPoly, linFit, analyzeCCE, analyzeCVD, analyzeDL, normComp };
+})();
+if (typeof module !== 'undefined') module.exports = PVT;
+
+</script>
+<script>
+// ===== PVT QC UI =====
+(() => {
+  const SAMPLE = {"cce": "P\tVrel\n5000\t0.9716\n4500\t0.9775\n4000\t0.9834\n3500\t0.9862\n3000\t0.9952\n2800\t0.9976\n2600\t1.0000\n2400\t1.0267\n2200\t1.0604\n2000\t1.1034\n1700\t1.1936\n1400\t1.3550\n1100\t1.5670\n800\t2.0045\n600\t2.5650\n", "cvd": "P\tLDO\tZ\tZ2ph\tNp\n5200\t0.00\t1.050\t1.050\t0.00\n4500\t5.33\t0.968\t0.9834\t7.60\n3800\t9.86\t0.907\t0.9274\t17.26\n3100\t9.35\t0.868\t0.8770\t28.62\n2400\t10.88\t0.851\t0.8621\t42.10\n1700\t8.82\t0.856\t0.8101\t57.63\n1000\t6.13\t0.882\t0.7914\t74.49\n", "comp": "Component\tFeed\t4500\t3800\t3100\t2400\t1700\t1000\nN2\t0.30\t0.308\t0.318\t0.322\t0.322\t0.317\t0.304\nCO2\t2.50\t2.552\t2.609\t2.643\t2.658\t2.641\t2.559\nC1\t72.00\t73.821\t75.820\t76.901\t77.121\t77.542\t73.182\nC2\t8.00\t8.131\t8.272\t8.364\t8.434\t8.445\t8.247\nC3\t4.50\t4.523\t4.537\t4.555\t4.613\t4.726\t4.733\niC4\t0.90\t0.894\t0.883\t0.878\t0.891\t0.935\t0.967\nnC4\t1.60\t1.583\t1.553\t1.537\t1.560\t1.653\t1.732\niC5\t0.70\t0.682\t0.653\t0.634\t0.643\t0.704\t0.777\nnC5\t0.80\t0.775\t0.737\t0.712\t0.720\t0.796\t0.894\nC6\t1.10\t1.038\t0.945\t0.881\t0.880\t1.020\t1.260\nC7+\t7.60\t5.692\t3.673\t2.574\t2.157\t1.222\t5.346\n", "dl": "P\tBo\tRs\tOilDensity\tGasZ\tGasGravity\n5000\t1.3797\t720.0\t0.7242\t\t\n4000\t1.3963\t720.0\t0.7156\t\t\n3000\t1.4132\t720.0\t0.7071\t\t\n2600\t1.4199\t720.0\t0.7037\t\t\n2200\t1.3757\t627.8\t0.7162\t0.853\t0.694\n1800\t1.3301\t532.6\t0.7295\t0.868\t0.721\n1400\t1.3046\t433.4\t0.7436\t0.889\t0.771\n1000\t1.2325\t328.9\t0.7709\t0.914\t0.857\n600\t1.1786\t216.3\t0.7719\t0.944\t0.992\n300\t1.1337\t122.5\t0.7821\t0.968\t1.132\n14.7\t1.0750\t0.0\t0.7926\t0.995\t1.300\n"};
+  const PROP = { Vrel: 'Relative volume', LDO: 'Liquid dropout', Z: 'Gas Z-factor', Z2ph: 'Two-phase Z', Np: 'Cum. moles produced', Bo: 'Bo', Rs: 'Rs', RhoO: 'Oil density', GasGrav: 'Gas gravity', Comp: 'Produced gas composition' };
+  const TESTS = ['CCE', 'CVD', 'DL'];
+  const TEST_NAME = { CCE: 'Constant composition expansion', CVD: 'Constant volume depletion', DL: 'Differential liberation' };
+  const LS = 'pvt-qc-v1';
+  const blank = () => ({
+    pUnit: 'psia', tUnit: 'F', k: 3, tolZ2: 1, tolRho: 1, r2min: 0.98, tab: 'CCE', excluded: {}, degs: {},
+    CCE: { text: '', Psat: '', fluid: 'oil' }, CVD: { text: '', comp: '', Pd: '', Zd: '', T: '' }, DL: { text: '', Pb: '', rhoSTO: '', rsUnit: 'scf/STB', rhoUnit: 'g/cc' },
+  });
+  const sample = () => ({ ...blank(),
+    CCE: { text: SAMPLE.cce, Psat: 2600, fluid: 'oil' },
+    CVD: { text: SAMPLE.cvd, comp: SAMPLE.comp, Pd: 5200, Zd: 1.05, T: 250 },
+    DL: { text: SAMPLE.dl, Pb: 2600, rhoSTO: 0.852, rsUnit: 'scf/STB', rhoUnit: 'g/cc' } });
+  let S;
+  try { S = JSON.parse(localStorage.getItem(LS)); } catch (e) { S = null; }
+  if (!S || !S.CCE) S = sample();
+  const save = () => { try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) {} };
+  const $ = (s, r = document) => r.querySelector(s);
+  const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const f = (v, d = 4) => v == null || !isFinite(v) ? '' : String(+(+v).toPrecision(d));
+  const fmtP = p => (+p).toString();
+
+  // ---------- analysis ----------
+  let R = {};
+  function analyze() {
+    const n = v => v === '' || v == null ? NaN : +v;
+    const g = { pUnit: S.pUnit, tUnit: S.tUnit };
+    R.CCE = PVT.analyzeCCE(S.CCE.text, { ...g, Psat: n(S.CCE.Psat), fluid: S.CCE.fluid }, S.excluded, S.degs, +S.k);
+    R.CVD = PVT.analyzeCVD(S.CVD.text, S.CVD.comp, { ...g, Pd: n(S.CVD.Pd), Zd: n(S.CVD.Zd), T: n(S.CVD.T), tolZ2: +S.tolZ2, r2min: +S.r2min }, S.excluded, S.degs, +S.k);
+    R.DL = PVT.analyzeDL(S.DL.text, { ...g, Pb: n(S.DL.Pb), rhoSTO: n(S.DL.rhoSTO), rsUnit: S.DL.rsUnit, rhoUnit: S.DL.rhoUnit, tolRho: +S.tolRho }, S.excluded, S.degs, +S.k);
+  }
+  // all regression points of a test: [{key,test,prop,P,value}]
+  function points(test) {
+    const r = R[test], out = [];
+    const props = { CCE: ['Vrel', 'LDO', 'Z'], CVD: ['LDO', 'Z', 'Z2ph', 'Np'], DL: ['Bo', 'Rs', 'RhoO', 'Z', 'GasGrav'] }[test];
+    for (const row of r.rows || []) for (const p of props) if (row[p] != null) out.push({ key: `${test}|${p}|${+row.P.toFixed(4)}`, test, prop: p, P: row.P, value: row[p] });
+    if (test === 'CVD' && r.mb) r.mb.hoff.forEach(h => out.push({ key: h.keys[0], test, prop: 'Comp', P: h.P, value: 'gas composition' }));
+    return out;
+  }
+  const isFlagged = (r, key) => (r.flags[key] || []).some(x => x.level !== 'info');
+  function counts(test) {
+    const r = R[test], pts = points(test);
+    return { n: pts.length, flagged: pts.filter(p => isFlagged(r, p.key) && !S.excluded[p.key]).length, excluded: pts.filter(p => S.excluded[p.key]).length };
+  }
+  function toggle(keys, force) {
+    const allEx = keys.every(k => S.excluded[k]);
+    const val = force ?? !allEx;
+    keys.forEach(k => { if (val) S.excluded[k] = true; else delete S.excluded[k]; });
+    refresh();
+  }
+
+  // ---------- charts ----------
+  const W = 560, H = 300, M = { l: 62, r: 16, t: 14, b: 44 };
+  function nice(lo, hi, n = 5) {
+    if (lo === hi) { lo -= Math.abs(lo) * 0.05 || 1; hi += Math.abs(hi) * 0.05 || 1; }
+    const span = hi - lo, step0 = span / n, mag = Math.pow(10, Math.floor(Math.log10(step0)));
+    const step = [1, 2, 2.5, 5, 10].map(m => m * mag).find(s => s >= step0);
+    const a = Math.floor(lo / step) * step, b = Math.ceil(hi / step) * step, t = [];
+    for (let v = a; v <= b + step * 1e-9; v += step) t.push(+v.toPrecision(12));
+    return { lo: a, hi: b, ticks: t };
+  }
+  function frame(xs, ys, xLabel, yLabel) {
+    const X = nice(Math.min(...xs), Math.max(...xs)), Y = nice(Math.min(...ys), Math.max(...ys));
+    const sx = v => M.l + (v - X.lo) / (X.hi - X.lo) * (W - M.l - M.r);
+    const sy = v => H - M.b - (v - Y.lo) / (Y.hi - Y.lo) * (H - M.t - M.b);
+    let g = '';
+    Y.ticks.forEach(t => { g += `<line class="grid" x1="${M.l}" x2="${W - M.r}" y1="${sy(t)}" y2="${sy(t)}"/><text class="tick" x="${M.l - 6}" y="${sy(t) + 4}" text-anchor="end">${+t.toPrecision(6)}</text>`; });
+    X.ticks.forEach(t => { g += `<text class="tick" x="${sx(t)}" y="${H - M.b + 16}" text-anchor="middle">${+t.toPrecision(6)}</text>`; });
+    g += `<line class="axis" x1="${M.l}" x2="${W - M.r}" y1="${H - M.b}" y2="${H - M.b}"/>`;
+    g += `<text class="alabel" x="${(M.l + W - M.r) / 2}" y="${H - 6}" text-anchor="middle">${esc(xLabel)}</text>`;
+    g += `<text class="alabel" transform="translate(14,${(M.t + H - M.b) / 2}) rotate(-90)" text-anchor="middle">${esc(yLabel)}</text>`;
+    return { sx, sy, g };
+  }
+  function marker(x, y, state, keys, tip) {
+    const d = `data-keys="${esc(keys.join(';'))}" data-tip="${esc(tip)}"`;
+    const hit = `<circle class="hit" cx="${x}" cy="${y}" r="11" ${d}/>`;
+    if (state === 'ex') return `<g class="pt ex"><circle cx="${x}" cy="${y}" r="5"/><path d="M${x - 3.5} ${y - 3.5}L${x + 3.5} ${y + 3.5}M${x + 3.5} ${y - 3.5}L${x - 3.5} ${y + 3.5}"/>${hit}</g>`;
+    if (state === 'fl') return `<g class="pt fl"><path d="M${x} ${y - 7}L${x + 7} ${y}L${x} ${y + 7}L${x - 7} ${y}Z"/>${hit}</g>`;
+    return `<g class="pt in"><circle cx="${x}" cy="${y}" r="5"/>${hit}</g>`;
+  }
+  const pUnitLbl = () => S.pUnit === 'bar' ? 'bara' : 'psia';
+  const xl = s => s.xLabel === 'Pressure' ? `Pressure (${pUnitLbl()})` : s.xLabel;
+  function stateOf(r, keys) { if (keys.every(k => S.excluded[k])) return 'ex'; return keys.some(k => isFlagged(r, k)) ? 'fl' : 'in'; }
+  function tipFor(r, p, extra) {
+    const reasons = [...new Set(p.keys.flatMap(k => (r.flags[k] || []).map(x => x.msg)))];
+    return [`P = ${fmtP(p.P)} ${pUnitLbl()}`, ...extra, ...reasons.map(m => '⚠ ' + m), S.excluded[p.keys[0]] ? 'Excluded — click to include' : 'Click to exclude'].join('\n');
+  }
+  function chartFit(r, s) {
+    const xs = s.pts.map(p => p.x).concat((s.curve || []).map(c => c[0])), ys = s.pts.map(p => p.y).concat((s.curve || []).map(c => c[1]));
+    const { sx, sy, g } = frame(xs, ys, xl(s), s.yLabel);
+    let body = g;
+    if (s.curve) body += `<path class="fit" d="${s.curve.map((c, i) => (i ? 'L' : 'M') + sx(c[0]).toFixed(1) + ' ' + sy(c[1]).toFixed(1)).join('')}"/>`;
+    s.pts.forEach(p => body += marker(sx(p.x), sy(p.y), stateOf(r, p.keys), p.keys,
+      tipFor(r, p, [`${s.yLabel}: ${f(p.y, 6)}`, p.fit != null ? `Trend: ${f(p.fit, 6)}  (z = ${p.z.toFixed(1)})` : ''].filter(Boolean))));
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title)}">${body}</svg>`;
+  }
+  function chartCompare(r, s) {
+    const xs = s.calcPts.map(p => p.x), ys = s.pts.map(p => p.y).concat(s.calcPts.map(p => p.calc));
+    const { sx, sy, g } = frame(xs, ys, xl(s), s.yLabel);
+    let body = g;
+    const cp = [...s.calcPts].sort((a, b) => a.x - b.x);
+    body += `<path class="calc" d="${cp.map((p, i) => (i ? 'L' : 'M') + sx(p.x).toFixed(1) + ' ' + sy(p.calc).toFixed(1)).join('')}"/>`;
+    cp.forEach(p => body += `<rect class="calcpt" x="${sx(p.x) - 3.5}" y="${sy(p.calc) - 3.5}" width="7" height="7"/>`);
+    s.pts.forEach(p => body += marker(sx(p.x), sy(p.y), stateOf(r, p.keys), p.keys,
+      tipFor(r, p, [`Reported: ${f(p.y, 5)}`, `Calculated: ${f(p.calc, 5)}`, `Deviation: ${p.dev.toFixed(2)}%`])));
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(s.title)}">${body}</svg>`;
+  }
+  const RAMP = ['#0d366b', '#184f95', '#256abf', '#3987e5', '#6da7ec', '#9ec5f4', '#b7d3f6'];
+  function chartHoffman(r) {
+    const hs = r.mb.hoff.filter(h => h.pts.length);
+    if (!hs.length) return '<p class="muted">No Hoffman points (needs C1–C6 / N2 / CO2 / H2S with positive liquid mole fractions).</p>';
+    const all = hs.flatMap(h => h.pts);
+    const { sx, sy, g } = frame(all.map(p => p.F), all.map(p => p.lkp), 'Hoffman factor F', `log₁₀(K·p), p in psia`);
+    let body = g;
+    hs.forEach((h, i) => {
+      const st = stateOf(r, h.keys), col = st === 'ex' ? 'var(--muted-ink)' : RAMP[Math.round(i * (RAMP.length - 1) / Math.max(1, hs.length - 1))];
+      if (h.fit) { const xs = h.pts.map(p => p.F), a = Math.min(...xs), b = Math.max(...xs);
+        body += `<line class="hline ${st}" style="stroke:${col}" x1="${sx(a)}" y1="${sy(h.fit.a + h.fit.b * a)}" x2="${sx(b)}" y2="${sy(h.fit.a + h.fit.b * b)}"/>`; }
+      h.pts.forEach(p => {
+        const tip = tipFor(r, { P: h.P, keys: h.keys }, [`${p.comp}: log(Kp) = ${p.lkp.toFixed(3)}, F = ${p.F.toFixed(3)}`, h.fit ? `Stage R² = ${h.fit.r2.toFixed(4)}` : '']);
+        const x = sx(p.F), y = sy(p.lkp), d = `data-keys="${esc(h.keys.join(';'))}" data-tip="${esc(tip)}"`;
+        body += st === 'fl' ? `<path class="hpt" style="fill:${col}" d="M${x} ${y - 6}L${x + 6} ${y}L${x} ${y + 6}L${x - 6} ${y}Z"/>` : `<circle class="hpt ${st}" style="${st === 'ex' ? 'fill:none;stroke:' + col : 'fill:' + col}" cx="${x}" cy="${y}" r="4.5"/>`;
+        body += `<circle class="hit" cx="${x}" cy="${y}" r="10" ${d}/>`;
+      });
+    });
+    const legend = hs.map((h, i) => { const st = stateOf(r, h.keys), col = st === 'ex' ? 'var(--muted-ink)' : RAMP[Math.round(i * (RAMP.length - 1) / Math.max(1, hs.length - 1))];
+      return `<button class="lg ${st}" data-keys="${esc(h.keys.join(';'))}"><i style="background:${col}"></i>${fmtP(h.P)}${st === 'fl' ? ' ⚠' : ''}${st === 'ex' ? ' (excluded)' : ''}</button>`; }).join('');
+    return `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Hoffman plot">${body}</svg><div class="legend">Stage pressure: ${legend}</div>`;
+  }
+  function mbTable(r) {
+    const mb = r.mb; const st = mb.stages.filter(s => !s.stop);
+    let h = `<div class="tscroll"><table class="mb"><thead><tr><th>Liquid x (mol %)</th>${st.map(s => `<th>${fmtP(s.P)}</th>`).join('')}</tr></thead><tbody>`;
+    mb.comps.forEach((c, i) => { h += `<tr><td>${esc(c)}</td>${st.map(s => { const v = 100 * s.x[i]; return `<td class="${v < 0 ? 'neg' : ''}">${v.toFixed(3)}</td>`; }).join('')}</tr>`; });
+    h += `<tr class="sub"><td>Liquid moles (per mole of feed)</td>${st.map(s => `<td class="${s.nL <= 0 ? 'neg' : ''}">${s.nL.toFixed(4)}</td>`).join('')}</tr>`;
+    h += `<tr class="sub"><td>Hoffman R²</td>${st.map(s => `<td class="${s.r2 != null && s.r2 < S.r2min ? 'neg' : ''}">${s.r2 != null ? s.r2.toFixed(4) : ''}</td>`).join('')}</tr></tbody></table></div>`;
+    const stop = mb.stages.find(s => s.stop); if (stop) h += `<p class="muted">${esc(stop.msg)}</p>`;
+    return h;
+  }
+
+  // ---------- rendering ----------
+  function card(test, s) {
+    const r = R[test];
+    const nfl = s.pts.filter(p => stateOf(r, p.keys) === 'fl').length;
+    const deg = s.kind === 'fit' ? `<label class="deg">Trend order <select data-deg="${s.id}">${[1, 2, 3, 4, 5].map(d => `<option ${d === (S.degs[s.id] ?? s.deg) ? 'selected' : ''}>${d}</option>`).join('')}</select></label>` : '';
+    const svg = s.kind === 'compare' ? chartCompare(r, s) : chartFit(r, s);
+    const rows = s.pts.map(p => { const stt = stateOf(r, p.keys);
+      const reasons = [...new Set(p.keys.flatMap(k => (r.flags[k] || []).map(x => (x.level === 'info' ? 'ℹ ' : '⚠ ') + x.msg)))];
+      return `<tr class="${stt}"><td>${fmtP(p.P)}</td><td>${f(p.y, 6)}</td><td>${s.kind === 'compare' ? f(p.calc, 5) : f(p.fit, 6)}</td><td>${s.kind === 'compare' ? p.dev.toFixed(2) + '%' : (p.z != null ? p.z.toFixed(1) : '')}</td><td class="why">${esc(reasons.join(' · '))}</td><td><input type="checkbox" ${stt !== 'ex' ? 'checked' : ''} data-keys="${esc(p.keys.join(';'))}" aria-label="Include point at ${p.P}"></td></tr>`; }).join('');
+    return `<article class="card"><header><h3>${esc(s.title)}</h3>${nfl ? `<span class="badge fl">⚠ ${nfl} flagged</span>` : '<span class="badge ok">✓ no flags</span>'}${deg}</header>
+      ${s.note ? `<p class="note">${esc(s.note)}</p>` : ''}${svg}
+      <details><summary>Point table</summary><div class="tscroll"><table><thead><tr><th>P</th><th>Value</th><th>${s.kind === 'compare' ? 'Calculated' : 'Trend'}</th><th>${s.kind === 'compare' ? 'Dev.' : 'z'}</th><th>Flags</th><th>Use</th></tr></thead><tbody>${rows}</tbody></table></div></details></article>`;
+  }
+  function flagTable(test) {
+    const r = R[test], pts = points(test).filter(p => (r.flags[p.key] || []).length || S.excluded[p.key]);
+    if (!pts.length) return '<p class="muted">Nothing flagged and nothing excluded.</p>';
+    return `<div class="tscroll"><table class="flags"><thead><tr><th>Use</th><th>Data</th><th>P (${pUnitLbl()})</th><th>Value</th><th>Why</th></tr></thead><tbody>${pts.map(p => {
+      const st = S.excluded[p.key] ? 'ex' : isFlagged(r, p.key) ? 'fl' : 'info';
+      return `<tr class="${st}"><td><input type="checkbox" ${S.excluded[p.key] ? '' : 'checked'} data-keys="${esc(p.key)}" aria-label="Include"></td><td>${PROP[p.prop]}</td><td>${fmtP(p.P)}</td><td>${typeof p.value === 'number' ? f(p.value, 6) : esc(p.value)}</td><td class="why">${(r.flags[p.key] || []).map(x => `<span class="${x.level}">${x.level === 'info' ? 'ℹ' : '⚠'} ${esc(x.msg)}</span>`).join('<br>') || '<span class="muted">Excluded by you</span>'}</td></tr>`; }).join('')}</tbody></table></div>`;
+  }
+  function renderResults(test) {
+    const r = R[test], c = counts(test), el = $(`#res-${test}`);
+    let h = '';
+    if (r.notes.length) h += `<div class="notes">${r.notes.map(n => `<p>ℹ ${esc(n)}</p>`).join('')}</div>`;
+    if (!c.n) { el.innerHTML = h + '<p class="empty">Paste your data in the panel above (or load the example) to run the checks.</p>'; return; }
+    h += `<div class="stats"><div><b>${c.n}</b><span>data points</span></div><div class="fl"><b>${c.flagged}</b><span>flagged, still included</span></div><div class="ex"><b>${c.excluded}</b><span>excluded</span></div>
+      <div class="acts"><button class="primary" data-act="exflag" ${c.flagged ? '' : 'disabled'}>Exclude all flagged</button><button data-act="incall" ${c.excluded ? '' : 'disabled'}>Include all</button></div></div>`;
+    h += `<section class="flagbox"><h2>Flagged and excluded points</h2>${flagTable(test)}</section>`;
+    h += `<div class="grid">${r.series.map(s => card(test, s)).join('')}`;
+    if (test === 'CVD' && r.mb) h += `<article class="card wide"><header><h3>Hoffman plot of K-values from the CVD material balance</h3></header>
+      <p class="note">Liquid compositions are back-calculated stage by stage from the feed, produced gas compositions, moles produced, liquid dropout and gas Z (Whitson–Torp material balance). Each stage should plot as a straight line. A negative liquid mole fraction or a bent line points to a bad gas analysis or bad volumetric data at that stage; an error carries forward into later stages, so fix the first bad stage first. Click a point or a legend entry to exclude that stage's gas composition.</p>
+      ${chartHoffman(r)}${mbTable(r)}</article>`;
+    h += '</div>';
+    el.innerHTML = h;
+  }
+  function renderTabs() {
+    document.querySelectorAll('.tabs button').forEach(b => {
+      const t = b.dataset.tab; b.classList.toggle('on', t === S.tab); b.setAttribute('aria-selected', t === S.tab);
+      if (TESTS.includes(t)) { const c = counts(t); b.querySelector('.cnt').innerHTML = c.n ? (c.flagged ? `<span class="fl">⚠ ${c.flagged}</span>` : '<span class="ok">✓</span>') + (c.excluded ? ` <span class="exn">${c.excluded} out</span>` : '') : ''; }
+    });
+    document.querySelectorAll('.panel').forEach(p => p.hidden = p.id !== 'tab-' + S.tab);
+  }
+  function exportCSV() {
+    const only = $('#onlyEx').checked, lines = ['Test,Property,Pressure (' + pUnitLbl() + '),Value,Weight,Status,Reasons'];
+    let nEx = 0;
+    TESTS.forEach(t => points(t).forEach(p => {
+      const ex = !!S.excluded[p.key]; if (ex) nEx++;
+      if (only && !ex) return;
+      const reasons = (R[t].flags[p.key] || []).map(x => x.msg).join('; ');
+      lines.push([t, PROP[p.prop], p.P, typeof p.value === 'number' ? p.value : p.value, ex ? 0 : 1, ex ? 'Excluded' : 'Included', '"' + reasons.replace(/"/g, "'") + '"'].join(','));
+    }));
+    $('#csv').value = lines.join('\n');
+    const byTest = TESTS.map(t => { const ex = points(t).filter(p => S.excluded[p.key]); return ex.length ? `<li><b>${t}</b>: ${ex.map(p => `${PROP[p.prop]} @ ${fmtP(p.P)}`).join(', ')}</li>` : ''; }).join('');
+    $('#exsum').innerHTML = nEx ? `<ul>${byTest}</ul>` : '<p class="muted">No points excluded yet.</p>';
+  }
+  function refresh() {
+    analyze(); save();
+    TESTS.forEach(renderResults); renderTabs();
+    if (S.tab === 'Export') exportCSV();
+  }
+
+  // ---------- data panels ----------
+  const field = (test, k, label, attrs = '') => `<label>${label}<input data-f="${test}.${k}" value="${esc(S[test][k])}" ${attrs}></label>`;
+  function buildPanels() {
+    const pu = pUnitLbl();
+    const help = {
+      CCE: 'Columns: <code>P</code>, <code>Vrel</code> (V/Vsat), optional <code>LDO</code> (liquid dropout %, gas condensate) and <code>Z</code> (above Psat). Tab, comma or space separated; header row first.',
+      CVD: 'Columns: <code>P</code>, <code>LDO</code> (% of dew point volume), <code>Z</code> (gas), <code>Z2ph</code> (two-phase Z), <code>Np</code> (cumulative moles produced, % of initial). Include the dew point row.',
+      DL: 'Columns: <code>P</code>, <code>Bo</code>, <code>Rs</code>, <code>OilDensity</code>, <code>GasZ</code>, <code>GasGravity</code>. Include the bubble point row and the final residual-oil stage.',
+    };
+    const extra = {
+      CCE: field('CCE', 'Psat', `Psat (${pu})`, 'inputmode="decimal"') + `<label>Fluid<select data-f="CCE.fluid"><option value="oil" ${S.CCE.fluid === 'oil' ? 'selected' : ''}>Oil (bubble point)</option><option value="gas" ${S.CCE.fluid === 'gas' ? 'selected' : ''}>Gas condensate (dew point)</option></select></label>`,
+      CVD: field('CVD', 'Pd', `Pdew (${pu})`, 'inputmode="decimal"') + field('CVD', 'Zd', 'Z at Pdew', 'inputmode="decimal" placeholder="from table"') + field('CVD', 'T', `Temperature (°${S.tUnit})`, 'inputmode="decimal"'),
+      DL: field('DL', 'Pb', `Pb (${pu})`, 'inputmode="decimal"') + field('DL', 'rhoSTO', 'Residual oil density at 60 °F (g/cc)', 'inputmode="decimal"') +
+        `<label>Rs units<select data-f="DL.rsUnit"><option ${S.DL.rsUnit === 'scf/STB' ? 'selected' : ''}>scf/STB</option><option ${S.DL.rsUnit === 'sm3/sm3' ? 'selected' : ''}>sm3/sm3</option></select></label>` +
+        `<label>Oil density units<select data-f="DL.rhoUnit"><option ${S.DL.rhoUnit === 'g/cc' ? 'selected' : ''}>g/cc</option><option ${S.DL.rhoUnit === 'kg/m3' ? 'selected' : ''}>kg/m3</option></select></label>`,
+    };
+    TESTS.forEach(t => {
+      $(`#data-${t}`).innerHTML = `<div class="fields">${extra[t]}</div>
+        <label class="ta">Data table <span class="muted">${help[t]}</span><textarea data-f="${t}.text" spellcheck="false" rows="9">${esc(S[t].text)}</textarea></label>
+        ${t === 'CVD' ? `<label class="ta">Produced gas compositions (optional, mol %) <span class="muted">First column component, second column <code>Feed</code>, then one column per stage headed by its pressure. Enables the material balance and Hoffman plot. Recognised for Hoffman: N2, CO2, H2S, C1–C6.</span><textarea data-f="CVD.comp" spellcheck="false" rows="9">${esc(S.CVD.comp)}</textarea></label>` : ''}
+        <div class="btns"><button data-act="sample" data-t="${t}">Load example data</button><button data-act="clear" data-t="${t}">Clear</button></div>`;
+    });
+    $('#g-p').value = S.pUnit; $('#g-t').value = S.tUnit; $('#g-k').value = S.k; $('#g-kv').textContent = S.k;
+    $('#g-z2').value = S.tolZ2; $('#g-rho').value = S.tolRho; $('#g-r2').value = S.r2min;
+  }
+
+  // ---------- events ----------
+  let deb;
+  document.addEventListener('input', e => {
+    const t = e.target;
+    if (t.dataset.f) { const [a, b] = t.dataset.f.split('.'); S[a][b] = t.value; clearTimeout(deb); deb = setTimeout(refresh, 250); }
+    if (t.id === 'g-k') { S.k = +t.value; $('#g-kv').textContent = S.k; clearTimeout(deb); deb = setTimeout(refresh, 120); }
+    if (['g-z2', 'g-rho', 'g-r2'].includes(t.id)) { S[{ 'g-z2': 'tolZ2', 'g-rho': 'tolRho', 'g-r2': 'r2min' }[t.id]] = t.value; clearTimeout(deb); deb = setTimeout(refresh, 250); }
+  });
+  document.addEventListener('change', e => {
+    const t = e.target;
+    if (t.dataset.deg) { S.degs[t.dataset.deg] = +t.value; refresh(); }
+    else if (t.type === 'checkbox' && t.dataset.keys) toggle(t.dataset.keys.split(';'), !t.checked);
+    else if (t.id === 'g-p') { S.pUnit = t.value; buildPanels(); refresh(); }
+    else if (t.id === 'g-t') { S.tUnit = t.value; buildPanels(); refresh(); }
+    else if (t.id === 'onlyEx') exportCSV();
+    else if (t.dataset.f && t.tagName === 'SELECT') { const [a, b] = t.dataset.f.split('.'); S[a][b] = t.value; refresh(); }
+  });
+  document.addEventListener('click', e => {
+    const hit = e.target.closest('.hit, .lg');
+    if (hit && hit.dataset.keys) { toggle(hit.dataset.keys.split(';')); return; }
+    const tab = e.target.closest('.tabs button'); if (tab) { S.tab = tab.dataset.tab; save(); renderTabs(); if (S.tab === 'Export') exportCSV(); return; }
+    const b = e.target.closest('button[data-act]'); if (!b) return;
+    const act = b.dataset.act, test = S.tab;
+    if (act === 'exflag') { points(test).forEach(p => { if (isFlagged(R[test], p.key)) S.excluded[p.key] = true; }); refresh(); }
+    if (act === 'incall') { Object.keys(S.excluded).forEach(k => { if (k.startsWith(test + '|')) delete S.excluded[k]; }); refresh(); }
+    if (act === 'sample') { const s = sample(); S[b.dataset.t] = s[b.dataset.t]; Object.keys(S.excluded).forEach(k => { if (k.startsWith(b.dataset.t + '|')) delete S.excluded[k]; }); S.pUnit = 'psia'; S.tUnit = 'F'; buildPanels(); refresh(); }
+    if (act === 'clear') { S[b.dataset.t] = blank()[b.dataset.t]; Object.keys(S.excluded).forEach(k => { if (k.startsWith(b.dataset.t + '|')) delete S.excluded[k]; }); buildPanels(); refresh(); }
+    if (act === 'copy') { const ta = $('#csv'); navigator.clipboard.writeText(ta.value).then(() => { b.textContent = 'Copied ✓'; setTimeout(() => b.textContent = 'Copy CSV', 1500); }).catch(() => { ta.select(); b.textContent = 'Press Ctrl/Cmd+C'; }); }
+    if (act === 'reset') { if (b.dataset.armed) { S = sample(); buildPanels(); refresh(); b.textContent = 'Reset everything'; delete b.dataset.armed; } else { b.dataset.armed = 1; b.textContent = 'Click again to confirm'; setTimeout(() => { b.textContent = 'Reset everything'; delete b.dataset.armed; }, 3000); } }
+  });
+  // tooltip
+  const tipEl = $('#tip');
+  document.addEventListener('mouseover', e => { const h = e.target.closest('[data-tip]'); if (!h) { tipEl.hidden = true; return; } tipEl.textContent = h.dataset.tip; tipEl.hidden = false; });
+  document.addEventListener('mousemove', e => { if (tipEl.hidden) return; const x = Math.min(e.clientX + 14, innerWidth - tipEl.offsetWidth - 8), y = e.clientY + 16 + tipEl.offsetHeight > innerHeight ? e.clientY - tipEl.offsetHeight - 10 : e.clientY + 16; tipEl.style.left = x + 'px'; tipEl.style.top = y + 'px'; });
+
+  buildPanels(); refresh();
+})();
+
+</script>
+</body>
+</html>
